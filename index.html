@@ -178,7 +178,7 @@ button.navi{background:none;border-left:none;border-right:none;border-bottom:non
 var SB_URL='https://qwjpnbclqgeyansbucyh.supabase.co';
 var SB_KEY='sb_publishable_14CmQiM7CkSIAo0yk3SWzg_nzU4j56O';
 var sb=(typeof supabase!=='undefined'&&supabase&&SB_URL)?supabase.createClient(SB_URL,SB_KEY):null;
-var cloud={enabled:!!sb,user:null,localOnly:false,authEmail:'',authMsg:''};
+var cloud={enabled:!!sb,user:null,localOnly:false,authEmail:'',authPass:'',authMode:'signin',authMsg:'',authErr:''};
 
 
 var P={
@@ -529,7 +529,9 @@ app.addEventListener('click',function(e){
  var it=id?itemById(id):null;
  switch(act){
   case 'closeovl':state.overlay=null;render();break;
-  case 'sendmagic':{var em=(cloud.authEmail||'').trim();if(em&&sb){sb.auth.signInWithOtp({email:em,options:{emailRedirectTo:location.href}});cloud.authMsg='Check your email for the sign-in link.';render();}break;}
+  case 'authmode':cloud.authMode=(cloud.authMode==='signup'?'signin':'signup');cloud.authMsg='';cloud.authErr='';render();break;
+  case 'emailpass':doEmailPass();break;
+  case 'forgotpass':doForgotPass();break;
   case 'skipauth':cloud.localOnly=true;render();break;
   case 'signout':if(sb){sb.auth.signOut();}cloud.user=null;cloud.localOnly=false;state.overlay=null;render();break;
   case 'add':addItem();break;
@@ -585,6 +587,7 @@ app.addEventListener('input',function(e){
  switch(act){
   case 'newname':state.newName=t.value;break;
   case 'authemail':cloud.authEmail=t.value;break;
+  case 'authpass':cloud.authPass=t.value;break;
   case 'search':state.search=t.value;renderListOnly();break;
   case 'ename':if(it){it.name=t.value;save();}break;
   case 'etag':if(it){it.tag=t.value;save();}break;
@@ -905,10 +908,43 @@ function renderLogin(){
   '<div style="font-size:20px;font-weight:500;color:var(--ink);">The Sustainable Home</div>'+
   '<div style="font-size:13px;color:var(--ink2);margin:6px 0 20px;line-height:1.5;">Sign in to sync your list, stores, ideas, and news across devices.</div>'+
   (cloud.authMsg?'<div style="font-size:12px;color:var(--greentx);background:var(--greenbg);border-radius:8px;padding:9px 11px;margin-bottom:12px;">'+esc(cloud.authMsg)+'</div>':'')+
-  '<input data-act="authemail" value="'+escA(cloud.authEmail)+'" placeholder="you@email.com" inputmode="email" style="width:100%;height:42px;border:.5px solid var(--border);border-radius:10px;padding:0 12px;font-size:15px;margin-bottom:10px;box-sizing:border-box;"/>'+
-  '<button class="done" data-act="sendmagic" style="width:100%;padding:12px;border-radius:10px;font-size:14px;">Email me a magic link</button>'+
+  (cloud.authErr?'<div style="font-size:12px;color:#8a1c1c;background:#fbe9e9;border-radius:8px;padding:9px 11px;margin-bottom:12px;">'+esc(cloud.authErr)+'</div>':'')+
+  '<input data-act="authemail" value="'+escA(cloud.authEmail)+'" placeholder="you@email.com" inputmode="email" autocomplete="email" style="width:100%;height:42px;border:.5px solid var(--border);border-radius:10px;padding:0 12px;font-size:15px;margin-bottom:10px;box-sizing:border-box;"/>'+
+  '<input data-act="authpass" value="'+escA(cloud.authPass)+'" type="password" placeholder="Password" autocomplete="'+(cloud.authMode==='signup'?'new-password':'current-password')+'" style="width:100%;height:42px;border:.5px solid var(--border);border-radius:10px;padding:0 12px;font-size:15px;margin-bottom:10px;box-sizing:border-box;"/>'+
+  '<button class="done" data-act="emailpass" style="width:100%;padding:12px;border-radius:10px;font-size:14px;">'+(cloud.authMode==='signup'?'Create account':'Sign in')+'</button>'+
+  (cloud.authMode==='signin'?'<div style="margin-top:10px;"><button class="addlink" data-act="forgotpass" style="margin:0 auto;font-size:12px;">Forgot password?</button></div>':'')+
+  '<div style="font-size:12px;color:var(--ink2);margin-top:14px;">'+(cloud.authMode==='signup'?'Already have an account? ':"Don't have an account? ")+'<button class="addlink" data-act="authmode" style="display:inline;padding:0;">'+(cloud.authMode==='signup'?'Sign in':'Create one')+'</button></div>'+
   '<div style="margin-top:14px;"><button class="addlink" data-act="skipauth" style="margin:0 auto;">Use without signing in</button></div>'+
  '</div>';
+}
+async function doEmailPass(){
+ var em=(cloud.authEmail||'').trim();var pw=cloud.authPass||'';
+ cloud.authMsg='';cloud.authErr='';
+ if(!em||!pw){cloud.authErr='Enter your email and password.';render();return;}
+ if(!sb){cloud.authErr='Cloud sync is unavailable right now.';render();return;}
+ if(cloud.authMode==='signup'&&pw.length<6){cloud.authErr='Password must be at least 6 characters.';render();return;}
+ try{
+  if(cloud.authMode==='signup'){
+   var su=await sb.auth.signUp({email:em,password:pw});
+   if(su.error){cloud.authErr=su.error.message;render();return;}
+   if(!(su.data&&su.data.session)){cloud.authMode='signin';cloud.authPass='';cloud.authMsg='Account created. Check your email to confirm, then sign in.';render();}
+  }else{
+   var si=await sb.auth.signInWithPassword({email:em,password:pw});
+   if(si.error){cloud.authErr=si.error.message;render();return;}
+   cloud.authPass='';
+  }
+ }catch(e){cloud.authErr='Something went wrong. Please try again.';render();}
+}
+async function doForgotPass(){
+ var em=(cloud.authEmail||'').trim();
+ cloud.authMsg='';cloud.authErr='';
+ if(!em){cloud.authErr='Enter your email first, then tap Forgot password.';render();return;}
+ if(!sb){cloud.authErr='Cloud sync is unavailable right now.';render();return;}
+ try{
+  var rp=await sb.auth.resetPasswordForEmail(em,{redirectTo:location.href});
+  if(rp.error){cloud.authErr=rp.error.message;render();return;}
+  cloud.authMsg='Password reset link sent. Check your email.';render();
+ }catch(e){cloud.authErr='Something went wrong. Please try again.';render();}
 }
 async function initAuth(){
  try{
