@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<title>The Sustainable Home — Consumables</title>
+<style>
+:root{
+  color-scheme: light;
+  --bg:#F1EFE8; --card:#ffffff; --muted:#F1EFE8; --border:#E3E1D8; --strong:#D3D1C7;
+  --ink:#173404; --ink2:#5F5E5A; --ink3:#888780;
+  --green:#639922; --green2:#97C459; --greenbg:#EAF3DE; --greentx:#27500A; --leaf:#C0DD97;
+  --radius:12px;
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);-webkit-font-smoothing:antialiased;font-size:15px;line-height:1.4}
+.wrap{max-width:460px;margin:0 auto;padding:14px 12px 60px}
+.ic{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-0.15em}
+.ic text{stroke:none;fill:currentColor}
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit;font-size:14px;color:var(--ink)}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--green2);outline-offset:0}
+
+.hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.brand{display:flex;align-items:center;gap:8px}
+.logo{width:30px;height:30px;border-radius:50%;background:var(--leaf);display:flex;align-items:center;justify-content:center;color:var(--greentx);font-size:18px}
+.brand small{display:block;font-size:11px;color:var(--green);letter-spacing:.02em}
+.brand b{display:block;font-size:17px;font-weight:500;color:var(--ink);line-height:1.1}
+.iconbtn{width:32px;height:32px;border-radius:8px;background:var(--card);border:.5px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--ink2);font-size:16px;padding:0}
+.iconbtn.act{background:var(--greenbg);border-color:var(--green2);color:var(--greentx)}
+
+.addbar{background:var(--card);border:.5px solid var(--border);border-radius:var(--radius);padding:8px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.addplus{background:none;border:none;color:var(--green);font-size:18px;display:flex;align-items:center;padding:0 2px}
+#newname{flex:1;border:none;background:transparent;height:30px;font-size:15px}
+#newname:focus{outline:none}
+.dtoggle{background:none;border:none;color:var(--green);font-size:12px;display:flex;align-items:center;gap:3px;white-space:nowrap}
+.draft{background:var(--card);border:.5px solid var(--border);border-radius:var(--radius);padding:12px;margin:-4px 0 10px}
+
+.frow{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.pills{flex:1;min-width:0;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex:none;font-size:12px;background:var(--card);border:.5px solid var(--border);color:var(--ink2);border-radius:20px;padding:5px 12px;white-space:nowrap}
+.pill.on{background:var(--greenbg);border-color:var(--green2);color:var(--greentx);font-weight:500}
+.tools{flex:none;display:flex;gap:4px}
+
+.searchbar{display:flex;align-items:center;gap:8px;background:var(--card);border:.5px solid var(--border);border-radius:var(--radius);padding:6px 10px;margin-bottom:12px}
+.searchbar input{flex:1;border:none;background:transparent;height:26px}
+.searchbar input:focus{outline:none}
+
+.slabel{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink3);margin:0 2px 6px}
+.list{display:flex;flex-direction:column;gap:8px}
+
+.item{background:var(--card);border:.5px solid var(--border);border-radius:var(--radius);padding:10px 12px;display:flex;gap:12px;align-items:center}
+.item.done{background:var(--muted);opacity:.62}
+.cb{width:30px;height:30px;border-radius:50%;border:2px solid var(--green2);flex:none;background:transparent;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;padding:0}
+.cb.on{background:var(--green2);border-color:var(--green2)}
+.body{flex:1;min-width:0;cursor:pointer}
+.nm{font-size:15px;font-weight:500;color:var(--ink)}
+.item.done .nm{color:var(--ink2);text-decoration:line-through}
+.mt{font-size:12px;color:var(--ink2);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item.done .mt{color:var(--ink3)}
+.ty{font-size:17px;flex:none;color:var(--ink3);display:flex}
+.ty.green{color:var(--green)}
+.eco{font-size:12px;font-weight:500;border-radius:6px;padding:2px 7px;flex:none;min-width:22px;text-align:center}
+.e-boldgreen{background:var(--green);color:#fff}
+.e-green{background:var(--greenbg);color:var(--greentx)}
+.e-amber{background:#FAEEDA;color:#633806}
+.e-red{background:#E24B4A;color:#fff}
+.item.done .eco{filter:grayscale(.35)}
+
+.item.editing{display:block;border:1.5px solid var(--green2);background:var(--card);opacity:1}
+.erow{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+.enm{flex:1;font-size:15px;font-weight:500;color:var(--ink);border:none;border-bottom:1px solid var(--border);background:transparent;height:30px}
+.lnk{background:none;border:none;color:var(--green);font-size:18px;display:flex;padding:0}
+.seg{display:flex;background:var(--muted);border-radius:8px;padding:3px;margin-bottom:10px}
+.seg button{flex:1;text-align:center;font-size:12px;color:var(--ink2);padding:7px 0;background:none;border:none;border-radius:6px;display:flex;align-items:center;justify-content:center;gap:4px}
+.seg button.on{font-weight:500;background:var(--card);color:var(--ink);box-shadow:0 0 0 .5px var(--border)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.f label{font-size:11px;color:var(--ink3);margin-bottom:3px;display:block}
+.f select,.f input,.f textarea{width:100%;font-size:13px;background:var(--muted);border:.5px solid var(--border);border-radius:8px;padding:7px 10px;height:auto}
+.f textarea{min-height:54px;resize:vertical}
+.erow2{display:flex;align-items:center;justify-content:space-between}
+.del{background:none;border:none;color:#A32D2D;font-size:13px;display:flex;align-items:center;gap:4px;padding:6px 0}
+.done{font-size:13px;font-weight:500;background:var(--green);color:#fff;border:none;border-radius:8px;padding:8px 18px}
+
+.uncheck{display:flex;align-items:center;gap:8px;margin:16px 2px}
+.uncheck .ln{flex:1;height:.5px;background:var(--strong)}
+.uncheck button{background:var(--green);color:#fff;font-size:13px;font-weight:500;border:none;border-radius:20px;padding:8px 15px;display:flex;align-items:center;gap:6px;flex:none}
+
+.arch{margin-top:16px}
+.archhd{display:flex;align-items:center;gap:6px;color:var(--ink2);font-size:13px;padding:4px 4px;background:none;border:none;width:100%}
+.archhd .ct{font-size:11px;color:var(--ink3);margin-left:auto}
+.archlist{margin-top:8px}
+
+.empty{text-align:center;color:var(--ink3);padding:44px 20px}
+.empty .big{font-size:34px;color:var(--green2);margin-bottom:10px}
+.empty p{margin:4px 0}
+
+.ovl{position:fixed;inset:0;background:rgba(23,52,4,.28);display:flex;align-items:flex-end;justify-content:center;z-index:50}
+.ovl.center{align-items:center}
+.sheet{background:var(--bg);width:100%;max-width:460px;border-radius:16px 16px 0 0;padding:16px 16px 28px;max-height:86vh;overflow-y:auto}
+.ovl.center .sheet{border-radius:16px;margin:0 12px}
+.sheethd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sheethd b{font-size:17px;font-weight:500}
+.xbtn{background:none;border:none;color:var(--ink2);font-size:20px;display:flex;padding:4px}
+.opt{display:flex;align-items:center;gap:10px;padding:11px 6px;border-top:.5px solid var(--border);font-size:14px;color:var(--ink);background:none;border-left:none;border-right:none;border-bottom:none;width:100%;text-align:left}
+.opt .chk{margin-left:auto;color:var(--green);font-size:16px}
+.navi{display:flex;align-items:center;gap:10px;padding:13px 6px;border-top:.5px solid var(--border);font-size:15px;color:var(--ink);width:100%;text-align:left}
+button.navi{background:none;border-left:none;border-right:none;border-bottom:none;cursor:pointer}
+.navi.muted{color:var(--ink3)}
+.navi .soon{margin-left:auto;font-size:11px;color:var(--ink3);background:var(--card);border:.5px solid var(--border);border-radius:10px;padding:2px 8px}
+.navi .soon.cur{color:var(--greentx);background:var(--greenbg);border-color:var(--green2)}
+.fpanel .f{margin-bottom:12px}
+.clearbtn{width:100%;background:var(--card);border:.5px solid var(--border);border-radius:8px;padding:11px;font-size:14px;color:var(--ink2);margin-top:4px}
+.hint{font-size:12px;color:var(--ink3);margin:2px 2px 0}
+
+.pagehd{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.backbtn{width:32px;height:32px;border-radius:8px;background:var(--card);border:.5px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--ink2);font-size:18px;padding:0}
+.addstorebtn{width:100%;background:var(--greenbg);border:.5px solid var(--green2);color:var(--greentx);border-radius:10px;padding:12px;font-size:14px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:14px}
+.scard{background:var(--card);border:.5px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px}
+.scardtop{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.scardtop .sname{flex:1;min-width:0;font-size:15px;font-weight:500;color:var(--ink);border:none;border-bottom:1px solid var(--border);background:transparent;height:30px}
+.scardtop button{background:none;border:none;color:var(--ink3);font-size:16px;display:flex;padding:4px}
+
+.tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:12px;padding-bottom:2px}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;font-size:12px;color:var(--ink2);background:var(--card);border:.5px solid var(--border);border-radius:20px;padding:6px 12px;display:flex;align-items:center;gap:5px;white-space:nowrap}
+.tab.on{font-weight:500;color:var(--greentx);background:var(--greenbg);border-color:var(--green2)}
+.subrow{display:flex;align-items:center;gap:6px;margin-bottom:12px;overflow-x:auto;scrollbar-width:none}
+.subrow::-webkit-scrollbar{display:none}
+.schip{flex:none;font-size:12px;color:var(--ink2);background:var(--card);border:.5px solid var(--border);border-radius:16px;padding:5px 11px}
+.schip.on{font-weight:500;color:var(--greentx);background:var(--greenbg);border-color:var(--green2)}
+.addlink{font-size:12px;color:var(--green);display:flex;align-items:center;gap:3px;flex:none;background:none;border:none;padding:2px 4px;cursor:pointer}
+.ncard{background:var(--card);border:.5px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px}
+.ncard.exp{border:1.5px solid var(--green2)}
+.ntop{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.nname{font-size:15px;font-weight:500;color:var(--ink)}
+.ndesc{font-size:12px;color:var(--ink2);margin-top:2px;line-height:1.45}
+.nmeta{display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap}
+.nmeta .m{font-size:11px;color:var(--ink2)}
+.spill{font-size:11px;font-weight:500;border-radius:12px;padding:3px 9px}
+.qgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;padding-top:10px;margin-top:10px;border-top:.5px solid var(--border)}
+.qlab{display:flex;justify-content:space-between;font-size:11px;color:var(--ink2)}
+.qbar{height:5px;background:#EAE8DF;border-radius:3px;margin-top:3px}
+.qfill{height:5px;border-radius:3px}
+.srcs{margin-top:12px;padding-top:10px;border-top:.5px solid var(--border)}
+.srcs .sh{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink3);margin-bottom:6px}
+.srcln{display:flex;align-items:center;gap:6px;font-size:12px;color:#185FA5;margin-bottom:6px;text-decoration:none}
+.barwrap{display:flex;height:8px;border-radius:5px;overflow:hidden;background:#EAE8DF}
+.status-seg{display:flex;background:var(--muted);border-radius:8px;padding:3px;margin-top:10px}
+.status-seg button{flex:1;font-size:12px;color:var(--ink2);padding:7px 0;background:none;border:none;border-radius:6px;cursor:pointer}
+.status-seg button.on{font-weight:500;background:var(--card);box-shadow:0 0 0 .5px var(--border)}
+.deflist{margin-top:4px}
+.defrow{display:flex;gap:14px;padding:14px 4px;border-top:.5px solid var(--border);align-items:flex-start}
+.deftier{font-size:18px;font-weight:500;color:var(--green);flex:none;width:48px}
+
+.newscard{background:var(--card);border:.5px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px;cursor:pointer}
+.newscard.exp{border:1.5px solid var(--green2);cursor:default}
+.nsrc{font-size:11px;color:var(--ink3)}
+.ntitle{font-size:14px;font-weight:500;color:var(--ink);line-height:1.3}
+.nbody{font-size:12px;color:var(--ink2);margin-top:4px;line-height:1.45}
+.nbody.clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.catpill{font-size:11px;font-weight:500;color:#27500A;background:#EAF3DE;border-radius:12px;padding:3px 9px;display:inline-flex;align-items:center;gap:4px}
+.newbadge{font-size:10px;font-weight:500;color:#27500A;background:#EAF3DE;border-radius:10px;padding:2px 7px}
+.addbtn{font-size:12px;font-weight:500;color:#fff;background:#639922;border:none;border-radius:16px;padding:7px 14px;display:inline-flex;align-items:center;gap:5px;cursor:pointer}
+.addbtn.done{background:#EAF3DE;color:#27500A}
+.srclink{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:#185FA5;text-decoration:none;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+"use strict";
+
+var SB_URL='https://qwjpnbclqgeyansbucyh.supabase.co';
+var SB_KEY='sb_publishable_14CmQiM7CkSIAo0yk3SWzg_nzU4j56O';
+var sb=(typeof supabase!=='undefined'&&supabase&&SB_URL)?supabase.createClient(SB_URL,SB_KEY):null;
+var cloud={enabled:!!sb,user:null,localOnly:false,authEmail:'',authMsg:''};
+
+
+var P={
+ plus:'<path d="M12 5v14M5 12h14"/>',
+ chevronDown:'<path d="M6 9l6 6l6 -6"/>',
+ chevronUp:'<path d="M6 15l6 -6l6 6"/>',
+ chevronRight:'<path d="M9 6l6 6l-6 6"/>',
+ chevronLeft:'<path d="M15 6l-6 6l6 6"/>',
+ search:'<circle cx="10.5" cy="10.5" r="7"/><line x1="21" y1="21" x2="15.5" y2="15.5"/>',
+ sort:'<path d="M3 9l4 -4l4 4"/><path d="M7 5v14"/><path d="M21 15l-4 4l-4 -4"/><path d="M17 5v14"/>',
+ filter:'<path d="M5 5h14l-5.5 7v6l-3 1.5v-7.5z"/>',
+ menu:'<line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/>',
+ check:'<path d="M5 12l5 5l10 -10"/>',
+ x:'<path d="M18 6l-12 12"/><path d="M6 6l12 12"/>',
+ trash:'<path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2 -2l1 -12"/><path d="M9 7v-2a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v2"/>',
+ leaf:'<path d="M5 21c.5 -6 4 -11 14 -11c0 8 -5 12 -11 12"/><path d="M5 21c3 -4 6 -7 9 -9"/>',
+ archive:'<rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10"/><line x1="10" y1="12" x2="14" y2="12"/>',
+ repeat:'<path d="M4 12v-2a3 3 0 0 1 3 -3h12"/><path d="M17 4l3 3l-3 3"/><path d="M20 12v2a3 3 0 0 1 -3 3h-12"/><path d="M7 20l-3 -3l3 -3"/>',
+ infinity:'<path d="M6.5 8a4 4 0 1 0 0 8c2 0 3.2 -1.6 5.5 -4s3.5 -4 5.5 -4a4 4 0 1 1 0 8c-2 0 -3.2 -1.6 -5.5 -4"/>',
+ basket:'<path d="M5 10h14l-1.4 8.2a2 2 0 0 1 -2 1.8h-7.2a2 2 0 0 1 -2 -1.8z"/><path d="M9 10l2 -5M15 10l-2 -5"/><line x1="9.5" y1="13.5" x2="9.5" y2="16.5"/><line x1="14.5" y1="13.5" x2="14.5" y2="16.5"/>',
+ store:'<path d="M4 9l1 -4h14l1 4"/><path d="M4 9a2 2 0 0 0 4 0a2 2 0 0 0 4 0a2 2 0 0 0 4 0a2 2 0 0 0 4 0"/><path d="M5 11v8a1 1 0 0 0 1 1h12a1 1 0 0 0 1 -1v-8"/>',
+ plant:'<path d="M12 20v-8"/><path d="M12 12c0 -3 -2 -5 -5 -5c0 3 2 5 5 5"/><path d="M12 11c0 -3 2 -5 5 -5c0 3 -2 5 -5 5"/>'
+};
+Object.assign(P,{
+ home:'<path d="M3 11l9 -8l9 8"/><path d="M6 10v10h12v-10"/>',
+ bolt:'<path d="M13 3l-8 10h6l-1 8l8 -10h-6z"/>',
+ droplet:'<path d="M12 3c4 5 6 8 6 11a6 6 0 0 1 -12 0c0 -3 2 -6 6 -11z"/>',
+ wind:'<path d="M4 8h10a2 2 0 1 0 -2 -2"/><path d="M4 12h14a2 2 0 1 1 -2 2"/><path d="M4 16h8a2 2 0 1 1 -2 2"/>',
+ recycle:'<path d="M4 12a8 8 0 0 1 8 -8"/><path d="M12 4l-3 2l3 2"/><path d="M20 12a8 8 0 0 1 -8 8"/><path d="M12 20l3 -2l-3 -2"/>',
+ car:'<circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M5 17h-2v-5l2 -5h11l4 5h1a2 2 0 0 1 2 2v3h-2"/><path d="M9 17h6"/>',
+ layoutDashboard:'<rect x="4" y="4" width="7" height="9" rx="1"/><rect x="13" y="4" width="7" height="5" rx="1"/><rect x="13" y="11" width="7" height="9" rx="1"/><rect x="4" y="15" width="7" height="5" rx="1"/>',
+ book:'<path d="M5 4h11a1 1 0 0 1 1 1v14a1 1 0 0 1 -1 1h-11a1 1 0 0 1 -1 -1v-14a1 1 0 0 1 1 -1z"/><path d="M9 4v16"/>',
+ ext:'<path d="M11 7h-4a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2v-4"/><path d="M14 4h6v6"/><path d="M20 4l-8 8"/>',
+ edit:'<path d="M4 20h4l10 -10a2 2 0 0 0 -4 -4l-10 10v4"/><path d="M13.5 6.5l4 4"/>'
+});
+Object.assign(P,{
+ bulb:'<path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 1 4 10.5c-.7 .7 -1 1.5 -1 2.5h-6c0 -1 -.3 -1.8 -1 -2.5a6 6 0 0 1 4 -10.5z"/>',
+ refresh:'<path d="M20 11a8 8 0 0 0 -14 -5m-2 -2v4h4"/><path d="M4 13a8 8 0 0 0 14 5m2 2v-4h-4"/>',
+ eye:'<path d="M12 5c-5 0 -9 4 -10 7c1 3 5 7 10 7s9 -4 10 -7c-1 -3 -5 -7 -10 -7z"/><circle cx="12" cy="12" r="2.5"/>'
+});
+Object.assign(P,{user:'<circle cx="12" cy="8" r="4"/><path d="M4 20a8 8 0 0 1 16 0"/>'});
+function ico(n){
+ if(n==='onetime'){return '<svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><text x="12" y="16" text-anchor="middle" font-size="12" font-family="var(--font)">1</text></svg>';}
+ return '<svg class="ic" viewBox="0 0 24 24">'+(P[n]||'')+'</svg>';
+}
+
+var TYPEMETA={
+ onetime:{ic:'onetime',label:'One time',green:false},
+ regular:{ic:'infinity',label:'Regular',green:false},
+ recurring:{ic:'repeat',label:'Recurring',green:true}
+};
+var FREQS=[['weekly','Weekly','Wk'],['monthly','Monthly','Mo'],['2months','Every 2 months','2Mo'],['quarterly','Quarterly','Qtr'],['semiannual','Semi-annually','6Mo'],['annual','Annually','Yr'],['custom','Custom days','']];
+var CATS=[{key:'house',label:'House',icon:'home'},{key:'energy',label:'Energy',icon:'bolt'},{key:'water',label:'Water',icon:'droplet'},{key:'air',label:'Air',icon:'wind'},{key:'waste',label:'Waste',icon:'recycle'},{key:'transport',label:'Transport',icon:'car'}];
+var QUAL=[['nontoxic','Non-toxic'],['longlasting','Long-lasting'],['efficient','Efficient'],['circular','Circular'],['costeffective','Cost-effective'],['beautiful','Beautiful']];
+var STATUSMETA={idea:{label:'Idea',bg:'#EAE8DF',tx:'#5F5E5A',dot:'#D3D1C7'},planned:{label:'Planned',bg:'#FAEEDA',tx:'#633806',dot:'#EF9F27'},done:{label:'Done',bg:'#EAF3DE',tx:'#27500A',dot:'#639922'}};
+var MED_INCOME=83730, MED_YEAR=2024;
+var AVAIL={available:{label:'Available',bg:'#EAF3DE',tx:'#27500A'},soon:{label:'Coming soon',bg:'#FAEEDA',tx:'#633806'},future:{label:'Future',bg:'#E6F1FB',tx:'#185FA5'}};
+var NEWSCATS=[{key:'consumables',label:'Consumables',icon:'basket'},{key:'house',label:'House',icon:'home'},{key:'energy',label:'Energy',icon:'bolt'},{key:'water',label:'Water',icon:'droplet'},{key:'air',label:'Air',icon:'wind'},{key:'waste',label:'Waste',icon:'recycle'},{key:'transport',label:'Transport',icon:'car'}];
+var NEWNESS={new:{label:'New',color:'#639922'},unviewed:{label:'Unviewed',color:'#EF9F27'},viewed:{label:'Viewed',color:'#B4B2A9'}};
+var KEY='sh_consumables_v1';
+
+var state={
+ items:[], stores:[], sort:'smart',
+ filter:{store:'',type:'',freq:'',tag:''},
+ search:'', searchOpen:false, archiveOpen:false,
+ editingId:null, detailsOpen:false, newName:'',
+ draft:{type:'regular',store:'',freqUnit:'weekly',freqDays:30,tag:'',eco:''},
+ overlay:null, view:'consumables',
+ needsTab:'dashboard', needsFilter:'all', needs:[], nEditingId:null, nExpandedId:null,
+ newsFilterCat:'all', newsFilterAvail:'all', newsSort:'new', news:[], newsExpandedId:null, newsEditingId:null
+};
+
+function migrateStores(arr){
+ return (arr||[]).map(function(s){
+  if(typeof s==='string')return {id:uid(),name:s,eco:'',category:'',note:''};
+  return {id:s.id||uid(),name:s.name||'',eco:(s.eco==null?'':s.eco),category:s.category||'',note:s.note||''};
+ });
+}
+function load(){
+ try{var raw=localStorage.getItem(KEY);
+  if(raw){var d=JSON.parse(raw);
+   state.items=d.items||[];state.stores=migrateStores(d.stores);state.sort=d.sort||'smart';
+   if(d.draft)state.draft=Object.assign(state.draft,d.draft);
+   state.needs=Array.isArray(d.needs)?d.needs:seedNeeds();
+   state.news=mergeNews(Array.isArray(d.news)?d.news:[],seedNews());
+  } else { state.needs=seedNeeds(); state.news=seedNews(); }
+ }catch(e){ if(!state.needs.length)state.needs=seedNeeds(); if(!state.news.length)state.news=seedNews(); }
+}
+function save(){
+ try{localStorage.setItem(KEY,JSON.stringify({items:state.items,stores:state.stores,sort:state.sort,draft:state.draft,needs:state.needs,news:state.news}));}catch(e){}
+ if(cloud.enabled&&cloud.user)cloudSync();
+}
+function storeNames(){return state.stores.map(function(s){return s.name;}).filter(Boolean);}
+
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function escA(s){return esc(s).replace(/'/g,'&#39;');}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+function trunc(s){return s.length>10?s.slice(0,10)+'…':s;}
+function freqAbbr(it){var f=FREQS.find(function(x){return x[0]===it.freqUnit;});if(it.freqUnit==='custom')return (it.freqDays||0)+'d';return f?f[2]:'';}
+function ecoCls(v){v=Number(v);return v>=9?'e-boldgreen':v>=7?'e-green':v>=4?'e-amber':'e-red';}
+
+function nextDue(it){
+ var d=new Date(it.checkedAt);
+ switch(it.freqUnit){
+  case 'weekly':d.setDate(d.getDate()+7);break;
+  case 'monthly':d.setMonth(d.getMonth()+1);break;
+  case '2months':d.setMonth(d.getMonth()+2);break;
+  case 'quarterly':d.setMonth(d.getMonth()+3);break;
+  case 'semiannual':d.setMonth(d.getMonth()+6);break;
+  case 'annual':d.setFullYear(d.getFullYear()+1);break;
+  case 'custom':d.setDate(d.getDate()+(Number(it.freqDays)||30));break;
+  default:d.setDate(d.getDate()+7);
+ }
+ return d.getTime();
+}
+function refreshRecurring(){
+ var now=Date.now(),ch=false;
+ state.items.forEach(function(it){
+  if(it.type==='recurring'&&it.checked&&it.checkedAt&&now>=nextDue(it)){it.checked=false;ch=true;}
+ });
+ if(ch)save();
+}
+
+function matches(it){
+ var f=state.filter;
+ if(state.search&&it.name.toLowerCase().indexOf(state.search.toLowerCase())<0)return false;
+ if(f.store&&it.store!==f.store)return false;
+ if(f.type&&it.type!==f.type)return false;
+ if(f.freq&&!(it.type==='recurring'&&it.freqUnit===f.freq))return false;
+ if(f.tag&&it.tag!==f.tag)return false;
+ return true;
+}
+function typeRank(t){return t==='onetime'?0:t==='regular'?1:2;}
+function freqRank(it){if(it.type!=='recurring')return 999;var i=FREQS.findIndex(function(x){return x[0]===it.freqUnit;});return it.freqUnit==='custom'?100+(Number(it.freqDays)||0):i;}
+function comparator(isChecked){
+ var s=state.sort;
+ if(s==='smart'){return isChecked?function(a,b){return (b.checkedAt||0)-(a.checkedAt||0);}:function(a,b){return (a.createdAt||0)-(b.createdAt||0);};}
+ if(s==='name')return function(a,b){return a.name.localeCompare(b.name);};
+ if(s==='namez')return function(a,b){return b.name.localeCompare(a.name);};
+ if(s==='type')return function(a,b){return typeRank(a.type)-typeRank(b.type)||a.name.localeCompare(b.name);};
+ if(s==='freq')return function(a,b){return freqRank(a)-freqRank(b)||a.name.localeCompare(b.name);};
+ if(s==='tag')return function(a,b){return (a.tag||'￿').localeCompare(b.tag||'￿')||a.name.localeCompare(b.name);};
+ if(s==='store')return function(a,b){return (a.store||'￿').localeCompare(b.store||'￿')||a.name.localeCompare(b.name);};
+ return function(){return 0;};
+}
+function groups(){
+ var vis=state.items.filter(matches);
+ var unchecked=vis.filter(function(i){return !i.checked;}).sort(comparator(false));
+ var purchased=vis.filter(function(i){return i.checked&&i.type!=='onetime';}).sort(comparator(true));
+ var archive=vis.filter(function(i){return i.checked&&i.type==='onetime';}).sort(comparator(true));
+ return {unchecked:unchecked,purchased:purchased,archive:archive};
+}
+
+function ecoOptions(sel){var o='<option value="">Not rated</option>';for(var i=0;i<=10;i++){o+='<option value="'+i+'"'+(String(sel)===String(i)?' selected':'')+'>'+i+'</option>';}return o;}
+function storeOptions(sel){var o='<option value="">No store</option>';storeNames().forEach(function(s){o+='<option'+(s===sel?' selected':'')+'>'+esc(s)+'</option>';});return o;}
+function freqOptions(sel){var o='';FREQS.forEach(function(f){o+='<option value="'+f[0]+'"'+(f[0]===sel?' selected':'')+'>'+f[1]+'</option>';});return o;}
+
+function segType(cur,pfx,id){
+ var idAttr=id?(' data-id="'+id+'"'):'';
+ return '<div class="seg">'+['onetime','regular','recurring'].map(function(t){
+  var m=TYPEMETA[t];
+  return '<button data-act="'+pfx+'type" data-type="'+t+'"'+idAttr+' class="'+(cur===t?'on':'')+'">'+ico(m.ic)+m.label+'</button>';
+ }).join('')+'</div>';
+}
+function freqField(freqUnit,freqDays,pfx,id){
+ var idAttr=id?(' data-id="'+id+'"'):'';
+ var custom=freqUnit==='custom'?'<div class="f" style="margin-top:8px"><label>Days between</label><input type="number" min="1" data-act="'+pfx+'fdays"'+idAttr+' value="'+(freqDays||30)+'"/></div>':'';
+ return '<div class="f"><label>Frequency</label><select data-act="'+pfx+'freq"'+idAttr+'>'+freqOptions(freqUnit)+'</select>'+custom+'</div>';
+}
+
+function draftForm(){
+ var d=state.draft;
+ var freq=d.type==='recurring'?freqField(d.freqUnit,d.freqDays,'d'):'';
+ return '<div class="draft">'+
+  segType(d.type,'d')+
+  '<div class="grid2">'+
+   (d.type==='recurring'?freq:'')+
+   '<div class="f"><label>Store</label><select data-act="dstore">'+storeOptions(d.store)+'</select></div>'+
+   '<div class="f"><label>Tag</label><input data-act="dtag" maxlength="40" value="'+escA(d.tag)+'" placeholder="e.g. Dairy"/></div>'+
+   '<div class="f"><label>Eco rating</label><select data-act="deco">'+ecoOptions(d.eco)+'</select></div>'+
+  '</div>'+
+  (storeNames().length?'':'<p class="hint">Add stores from Menu → Stores to use the store field.</p>')+
+ '</div>';
+}
+
+function rowDisplay(it){
+ var m=TYPEMETA[it.type];
+ var meta=[];
+ if(it.store)meta.push(esc(it.store));
+ if(it.tag)meta.push(esc(trunc(it.tag)));
+ if(it.type==='recurring')meta.push(freqAbbr(it));
+ var badge=(it.eco===''||it.eco==null)?'':'<span class="eco '+ecoCls(it.eco)+'">'+it.eco+'</span>';
+ return '<div class="item'+(it.checked?' done':'')+'">'+
+  '<button class="cb'+(it.checked?' on':'')+'" data-act="toggle" data-id="'+it.id+'" aria-label="Mark purchased">'+(it.checked?ico('check'):'')+'</button>'+
+  '<div class="body" data-act="edit" data-id="'+it.id+'"><div class="nm">'+esc(it.name)+'</div>'+(meta.length?'<div class="mt">'+meta.join(' · ')+'</div>':'')+'</div>'+
+  '<span class="ty'+(m.green?' green':'')+'" title="'+m.label+'">'+ico(m.ic)+'</span>'+badge+
+ '</div>';
+}
+function rowEdit(it){
+ var freq=it.type==='recurring'?freqField(it.freqUnit,it.freqDays,'e',it.id):'';
+ return '<div class="item editing">'+
+  '<div class="erow">'+
+   '<button class="cb'+(it.checked?' on':'')+'" data-act="toggle" data-id="'+it.id+'" aria-label="Mark purchased">'+(it.checked?ico('check'):'')+'</button>'+
+   '<input class="enm" data-act="ename" data-id="'+it.id+'" value="'+escA(it.name)+'"/>'+
+   '<button class="lnk" data-act="done" data-id="'+it.id+'" aria-label="Collapse">'+ico('chevronUp')+'</button>'+
+  '</div>'+
+  segType(it.type,'e',it.id)+
+  '<div class="grid2">'+
+   (it.type==='recurring'?freq:'')+
+   '<div class="f"><label>Store</label><select data-act="estore" data-id="'+it.id+'">'+storeOptions(it.store)+'</select></div>'+
+   '<div class="f"><label>Tag</label><input data-act="etag" data-id="'+it.id+'" maxlength="40" value="'+escA(it.tag)+'"/></div>'+
+   '<div class="f"><label>Eco rating</label><select data-act="eeco" data-id="'+it.id+'">'+ecoOptions(it.eco)+'</select></div>'+
+  '</div>'+
+  '<div class="erow2">'+
+   '<button class="del" data-act="del" data-id="'+it.id+'">'+ico('trash')+' Delete</button>'+
+   '<button class="done" data-act="done" data-id="'+it.id+'">Done</button>'+
+  '</div>'+
+ '</div>';
+}
+function row(it){return it.id===state.editingId?rowEdit(it):rowDisplay(it);}
+
+function overlayHTML(){
+ if(state.overlay==='sort'){
+  var opts=[['smart','Recently added / checked'],['name','Name (A–Z)'],['namez','Name (Z–A)'],['type','Type'],['freq','Frequency'],['tag','Tag'],['store','Store']];
+  return ovlWrap('Sort',opts.map(function(o){return '<button class="opt" data-act="setsort" data-v="'+o[0]+'">'+o[1]+(state.sort===o[0]?'<span class="chk">'+ico('check')+'</span>':'')+'</button>';}).join(''));
+ }
+ if(state.overlay==='filter'){
+  var tags=Array.from(new Set(state.items.map(function(i){return i.tag;}).filter(Boolean))).sort();
+  var body='<div class="fpanel">'+
+   '<div class="f"><label>Type</label><select data-act="ftype"><option value="">All types</option>'+
+     ['onetime','regular','recurring'].map(function(t){return '<option value="'+t+'"'+(state.filter.type===t?' selected':'')+'>'+TYPEMETA[t].label+'</option>';}).join('')+'</select></div>'+
+   '<div class="f"><label>Frequency</label><select data-act="ffreq"><option value="">Any frequency</option>'+
+     FREQS.map(function(f){return '<option value="'+f[0]+'"'+(state.filter.freq===f[0]?' selected':'')+'>'+f[1]+'</option>';}).join('')+'</select></div>'+
+   '<div class="f"><label>Tag</label><select data-act="ftag"><option value="">Any tag</option>'+
+     tags.map(function(t){return '<option'+(state.filter.tag===t?' selected':'')+'>'+esc(t)+'</option>';}).join('')+'</select></div>'+
+   '<button class="clearbtn" data-act="clearfilter">Clear filters</button>'+
+  '</div>';
+  return ovlWrap('Filter',body);
+ }
+ if(state.overlay==='menu'){
+  var nav=menuNav();
+  return ovlWrap('Menu',nav);
+ }
+ if(state.overlay==='newssort'){var so=[['new','Newest first'],['old','Oldest first'],['unread','Unread first']];return ovlWrap('Sort by newness',so.map(function(o){return '<button class="opt" data-act="setnewssort" data-v="'+o[0]+'">'+o[1]+(state.newsSort===o[0]?'<span class="chk">'+ico('check')+'</span>':'')+'</button>';}).join(''));
+ }
+ return '';
+}
+function ovlWrap(title,body){
+ return '<div class="ovl" data-role="ovl"><div class="sheet">'+
+  '<div class="sheethd"><b>'+title+'</b><button class="xbtn" data-act="closeovl" aria-label="Close">'+ico('x')+'</button></div>'+
+  body+'</div></div>';
+}
+
+function renderStores(){
+ var list=state.stores.map(function(s,i){
+  var badge=(s.eco===''||s.eco==null)?'':'<span class="eco '+ecoCls(s.eco)+'">'+s.eco+'</span>';
+  return '<div class="scard">'+
+   '<div class="scardtop"><input class="sname" data-act="sname" data-i="'+i+'" data-orig="'+escA(s.name)+'" value="'+escA(s.name)+'" placeholder="Store name"/>'+badge+
+     '<button data-act="sdel" data-i="'+i+'" aria-label="Delete store">'+ico('trash')+'</button></div>'+
+   '<div class="grid2">'+
+     '<div class="f"><label>Eco rating (0–10)</label><select data-act="seco" data-i="'+i+'">'+ecoOptions(s.eco)+'</select></div>'+
+     '<div class="f"><label>Category</label><input data-act="scat" data-i="'+i+'" value="'+escA(s.category||'')+'" placeholder="Grocery, refill…"/></div>'+
+   '</div>'+
+   '<div class="f"><label>Notes</label><textarea data-act="snote" data-i="'+i+'" placeholder="Location, hours, what you buy here…">'+esc(s.note||'')+'</textarea></div>'+
+  '</div>';
+ }).join('');
+ var empty=state.stores.length?'':'<div class="empty"><div class="big">'+ico('store')+'</div><p style="font-weight:500;color:var(--ink)">No stores yet</p><p>Add the shops you buy from, rate how sustainable they are, and keep notes.</p></div>';
+ return '<div class="pagehd"><button class="backbtn" data-act="backhome" aria-label="Back to Consumables">'+ico('chevronLeft')+'</button>'+
+   '<div class="brand"><span class="logo">'+ico('store')+'</span><div><small>The Sustainable Home</small><b>Stores</b></div></div></div>'+
+   '<button class="addstorebtn" data-act="saddstore">'+ico('plus')+' Add store</button>'+
+   (state.stores.length?list:empty);
+}
+
+function render(){
+ refreshRecurring();
+ var app=document.getElementById('app');
+ if(cloud.enabled&&!cloud.user&&!cloud.localOnly){app.innerHTML=renderLogin();return;}
+ if(state.view==='stores'){app.innerHTML=renderStores()+overlayHTML();return;}
+ if(state.view==='needs'){app.innerHTML=renderNeeds()+overlayHTML();return;}
+ if(state.view==='definitions'){app.innerHTML=renderDefinitions()+overlayHTML();return;}
+ if(state.view==='news'){app.innerHTML=renderNews()+overlayHTML();return;}
+
+ var g=groups();
+ var pills='<button class="pill'+(state.filter.store?'':' on')+'" data-act="pillstore" data-v="">All</button>'+
+   storeNames().map(function(s){return '<button class="pill'+(state.filter.store===s?' on':'')+'" data-act="pillstore" data-v="'+escA(s)+'">'+esc(s)+'</button>';}).join('');
+ var anyFilter=state.filter.type||state.filter.freq||state.filter.tag;
+
+ var html=''+
+ '<div class="hd">'+
+  '<div class="brand"><span class="logo">'+ico('plant')+'</span><div><small>The Sustainable Home</small><b>Consumables</b></div></div>'+
+  '<button class="iconbtn" data-act="openmenu" aria-label="Menu">'+ico('menu')+'</button>'+
+ '</div>'+
+ '<div class="addbar">'+
+  '<button class="addplus" data-act="add" aria-label="Add">'+ico('plus')+'</button>'+
+  '<input id="newname" data-act="newname" placeholder="Add an item…" value="'+escA(state.newName)+'"/>'+
+  '<button class="dtoggle" data-act="toggledetails">Details '+ico(state.detailsOpen?'chevronUp':'chevronDown')+'</button>'+
+ '</div>'+
+ (state.detailsOpen?draftForm():'')+
+ '<div class="frow">'+
+  '<div class="pills">'+pills+'</div>'+
+  '<div class="tools">'+
+   '<button class="iconbtn'+(state.searchOpen?' act':'')+'" data-act="togglesearch" aria-label="Search">'+ico('search')+'</button>'+
+   '<button class="iconbtn" data-act="opensort" aria-label="Sort">'+ico('sort')+'</button>'+
+   '<button class="iconbtn'+(anyFilter?' act':'')+'" data-act="openfilter" aria-label="Filter">'+ico('filter')+'</button>'+
+  '</div>'+
+ '</div>'+
+ (state.searchOpen?'<div class="searchbar">'+ico('search')+'<input id="searchinput" data-act="search" placeholder="Search by name" value="'+escA(state.search)+'"/>'+(state.search?'<button class="xbtn" data-act="clearsearch">'+ico('x')+'</button>':'')+'</div>':'');
+
+ if(state.items.length===0){
+  html+='<div class="empty"><div class="big">'+ico('basket')+'</div><p style="font-weight:500;color:var(--ink)">Start your list</p><p>Add an item above. Choose One time, Regular, or Recurring, and rate how sustainable it is.</p></div>';
+ } else {
+  html+='<div class="slabel">To buy · '+g.unchecked.length+'</div>';
+  html+='<div class="list">'+(g.unchecked.length?g.unchecked.map(row).join(''):'<p class="hint" style="padding:6px 2px">Nothing to buy right now.</p>')+'</div>';
+  html+='<div class="uncheck"><span class="ln"></span>'+
+   (g.purchased.length?'<button data-act="uncheckall">'+ico('basket')+' Ready to shop — uncheck all</button>':'<span class="ln" style="flex:0"></span>')+
+   '<span class="ln"></span></div>';
+  if(g.purchased.length){
+   html+='<div class="slabel">Purchased · '+g.purchased.length+'</div>';
+   html+='<div class="list">'+g.purchased.map(row).join('')+'</div>';
+  }
+  if(g.archive.length){
+   html+='<div class="arch"><button class="archhd" data-act="togglearchive">'+ico(state.archiveOpen?'chevronDown':'chevronRight')+ico('archive')+'<span>Archive</span><span class="ct">'+g.archive.length+' one-time item'+(g.archive.length>1?'s':'')+'</span></button>'+
+    (state.archiveOpen?'<div class="list archlist">'+g.archive.map(row).join('')+'</div>':'')+'</div>';
+  }
+ }
+ html+=overlayHTML();
+ app.innerHTML=html;
+}
+
+function itemById(id){return state.items.find(function(i){return i.id===id;});}
+function addItem(){
+ var name=(state.newName||'').trim();
+ if(!name)return;
+ var d=state.draft;
+ state.items.push({id:uid(),name:name,type:d.type,freqUnit:d.freqUnit,freqDays:d.freqDays,tag:d.tag,store:d.store,eco:d.eco,checked:false,checkedAt:null,createdAt:Date.now()});
+ state.newName='';state.draft.tag='';state.draft.eco='';
+ save();render();
+ var el=document.getElementById('newname');if(el)el.focus();
+}
+
+var app=document.getElementById('app');
+app.addEventListener('click',function(e){
+ if(e.target.classList&&e.target.classList.contains('ovl')){state.overlay=null;render();return;}
+ var t=e.target.closest('[data-act]');
+ if(!t)return;
+ var act=t.getAttribute('data-act');
+ var id=t.getAttribute('data-id');
+ var it=id?itemById(id):null;
+ switch(act){
+  case 'closeovl':state.overlay=null;render();break;
+  case 'sendmagic':{var em=(cloud.authEmail||'').trim();if(em&&sb){sb.auth.signInWithOtp({email:em,options:{emailRedirectTo:location.href}});cloud.authMsg='Check your email for the sign-in link.';render();}break;}
+  case 'skipauth':cloud.localOnly=true;render();break;
+  case 'signout':if(sb){sb.auth.signOut();}cloud.user=null;cloud.localOnly=false;state.overlay=null;render();break;
+  case 'add':addItem();break;
+  case 'toggledetails':state.detailsOpen=!state.detailsOpen;render();break;
+  case 'togglesearch':state.searchOpen=!state.searchOpen;if(!state.searchOpen)state.search='';render();if(state.searchOpen){var s=document.getElementById('searchinput');if(s)s.focus();}break;
+  case 'clearsearch':state.search='';render();break;
+  case 'opensort':state.overlay='sort';render();break;
+  case 'openfilter':state.overlay='filter';render();break;
+  case 'openmenu':state.overlay='menu';render();break;
+  case 'openstores':state.overlay=null;state.view='stores';render();break;
+  case 'backhome':state.overlay=null;state.view='consumables';render();break;
+  case 'nav':state.overlay=null;state.view=t.getAttribute('data-v');render();break;
+  case 'ntab':state.needsTab=t.getAttribute('data-v');state.nExpandedId=null;state.nEditingId=null;render();break;
+  case 'nfilter':state.needsFilter=t.getAttribute('data-v');render();break;
+  case 'nexpand':state.nExpandedId=(state.nExpandedId===id?null:id);state.nEditingId=null;render();break;
+  case 'nadd':{var nc=state.needsTab;if(nc==='dashboard')nc='house';var nid=uid();state.needs.push({id:nid,category:nc,name:'',desc:'',cost:2,roi:null,status:'idea',q:[5,5,5,5,5,5],sources:[]});state.needsTab=nc;state.nEditingId=nid;state.nExpandedId=nid;save();render();var nel=document.querySelector('[data-act="nname"]');if(nel)nel.focus();break;}
+  case 'nedit':state.nEditingId=id;state.nExpandedId=id;render();break;
+  case 'ndone':state.nEditingId=null;save();render();break;
+  case 'ndel':state.needs=state.needs.filter(function(x){return x.id!==id;});state.nEditingId=null;state.nExpandedId=null;save();render();break;
+  case 'nstatus':{var ns=needById(id);if(ns){ns.status=t.getAttribute('data-v');save();render();}break;}
+  case 'nsrcadd':{var na=needById(id);if(na){na.sources.push(['','']);save();render();}break;}
+  case 'nsrcdel':{var nd=needById(id);if(nd){nd.sources.splice(Number(t.getAttribute('data-si')),1);save();render();}break;}
+  case 'newssortopen':state.overlay='newssort';render();break;
+  case 'setnewssort':state.newsSort=t.getAttribute('data-v');state.overlay=null;save();render();break;
+  case 'newsfiltcat':state.newsFilterCat=t.getAttribute('data-v');render();break;
+  case 'newsfiltavail':state.newsFilterAvail=t.getAttribute('data-v');render();break;
+  case 'newsexpand':{var ax=newsById(id);if(ax){if(state.newsExpandedId===id){state.newsExpandedId=null;}else{state.newsExpandedId=id;ax.viewed=true;}state.newsEditingId=null;save();render();}break;}
+  case 'newscollapse':state.newsExpandedId=null;render();break;
+  case 'newsedit':state.newsEditingId=id;state.newsExpandedId=id;render();break;
+  case 'newsdone':state.newsEditingId=null;save();render();break;
+  case 'newsdel':state.news=state.news.filter(function(x){return x.id!==id;});state.newsEditingId=null;state.newsExpandedId=null;save();render();break;
+  case 'newsaddnew':{var naw=uid();state.news.unshift({id:naw,title:'',source:'',url:'',body:'',category:'house',availability:'available',publishedAt:Date.now(),viewed:true,added:false});state.newsEditingId=naw;state.newsExpandedId=naw;save();render();var ntf=document.querySelector('[data-act="newstitle"]');if(ntf)ntf.focus();break;}
+  case 'newsact':{var an=newsById(id);if(an){if(an.category==='consumables'){var iid=uid();state.items.push({id:iid,name:an.title,type:'regular',freqUnit:'weekly',freqDays:7,tag:'',store:'',eco:'',checked:false,checkedAt:null,createdAt:Date.now()});an.added=true;state.view='consumables';state.editingId=iid;}else{var nid2=uid();state.needs.push({id:nid2,category:an.category,name:an.title,desc:an.body,cost:2,roi:null,status:'idea',q:[5,5,5,5,5,5],sources:[[an.source,an.url]]});an.added=true;state.view='needs';state.needsTab=an.category;state.nEditingId=nid2;state.nExpandedId=nid2;}save();render();}break;}
+  case 'setsort':state.sort=t.getAttribute('data-v');state.overlay=null;save();render();break;
+  case 'pillstore':state.filter.store=t.getAttribute('data-v');render();break;
+  case 'clearfilter':state.filter.type='';state.filter.freq='';state.filter.tag='';render();break;
+  case 'togglearchive':state.archiveOpen=!state.archiveOpen;render();break;
+  case 'uncheckall':state.items.forEach(function(i){if(i.checked&&i.type!=='onetime')i.checked=false;});save();render();break;
+  case 'toggle':if(it){it.checked=!it.checked;if(it.checked)it.checkedAt=Date.now();save();render();}break;
+  case 'edit':state.editingId=(state.editingId===id?null:id);render();break;
+  case 'done':state.editingId=null;render();break;
+  case 'del':if(it){state.items=state.items.filter(function(i){return i.id!==id;});state.editingId=null;save();render();}break;
+  case 'dtype':state.draft.type=t.getAttribute('data-type');save();render();break;
+  case 'etype':if(it){it.type=t.getAttribute('data-type');if(it.type==='recurring'&&!it.freqUnit)it.freqUnit='weekly';save();render();}break;
+  case 'saddstore':state.stores.push({id:uid(),name:'',eco:'',category:'',note:''});save();render();var ins=document.querySelectorAll('[data-act="sname"]');if(ins.length)ins[ins.length-1].focus();break;
+  case 'sdel':{var di=Number(t.getAttribute('data-i'));var nm=state.stores[di]?state.stores[di].name:'';state.stores.splice(di,1);state.items.forEach(function(i){if(i.store===nm)i.store='';});if(state.filter.store===nm)state.filter.store='';save();render();break;}
+ }
+});
+
+app.addEventListener('input',function(e){
+ var t=e.target.closest('[data-act]');if(!t)return;
+ var act=t.getAttribute('data-act');var id=t.getAttribute('data-id');var it=id?itemById(id):null;
+ switch(act){
+  case 'newname':state.newName=t.value;break;
+  case 'authemail':cloud.authEmail=t.value;break;
+  case 'search':state.search=t.value;renderListOnly();break;
+  case 'ename':if(it){it.name=t.value;save();}break;
+  case 'etag':if(it){it.tag=t.value;save();}break;
+  case 'dtag':state.draft.tag=t.value;save();break;
+  case 'scat':{var i=Number(t.getAttribute('data-i'));if(state.stores[i]){state.stores[i].category=t.value;save();}break;}
+  case 'snote':{var j=Number(t.getAttribute('data-i'));if(state.stores[j]){state.stores[j].note=t.value;save();}break;}
+  case 'nname':{var i1=needById(id);if(i1){i1.name=t.value;save();}break;}
+  case 'ndesc':{var i2=needById(id);if(i2){i2.desc=t.value;save();}break;}
+  case 'nroi':{var i3=needById(id);if(i3){var rv=t.value.trim();i3.roi=rv===''?null:Number(rv);save();}break;}
+  case 'nsrct':{var i4=needById(id);if(i4){i4.sources[Number(t.getAttribute('data-si'))][0]=t.value;save();}break;}
+  case 'nsrcu':{var i5=needById(id);if(i5){i5.sources[Number(t.getAttribute('data-si'))][1]=t.value;save();}break;}
+  case 'newstitle':{var w1=newsById(id);if(w1){w1.title=t.value;save();}break;}
+  case 'newssource':{var w2=newsById(id);if(w2){w2.source=t.value;save();}break;}
+  case 'newsurl':{var w3=newsById(id);if(w3){w3.url=t.value;save();}break;}
+  case 'newsbody':{var w4=newsById(id);if(w4){w4.body=t.value;save();}break;}
+ }
+});
+
+app.addEventListener('change',function(e){
+ var t=e.target.closest('[data-act]');if(!t)return;
+ var act=t.getAttribute('data-act');var id=t.getAttribute('data-id');var it=id?itemById(id):null;
+ switch(act){
+  case 'estore':if(it){it.store=t.value;save();render();}break;
+  case 'eeco':if(it){it.eco=t.value===''?'':Number(t.value);save();render();}break;
+  case 'efreq':if(it){it.freqUnit=t.value;save();render();}break;
+  case 'efdays':if(it){it.freqDays=Number(t.value)||1;save();}break;
+  case 'dstore':state.draft.store=t.value;save();break;
+  case 'deco':state.draft.eco=t.value===''?'':Number(t.value);save();break;
+  case 'dfreq':state.draft.freqUnit=t.value;save();render();break;
+  case 'dfdays':state.draft.freqDays=Number(t.value)||1;save();break;
+  case 'ftype':state.filter.type=t.value;render();break;
+  case 'ffreq':state.filter.freq=t.value;render();break;
+  case 'ftag':state.filter.tag=t.value;render();break;
+  case 'seco':{var i=Number(t.getAttribute('data-i'));if(state.stores[i]){state.stores[i].eco=t.value===''?'':Number(t.value);save();render();}break;}
+  case 'sname':{var k=Number(t.getAttribute('data-i'));if(state.stores[k]){var old=t.getAttribute('data-orig');var nv=t.value.trim()||old;state.stores[k].name=nv;state.items.forEach(function(i){if(i.store===old)i.store=nv;});if(state.filter.store===old)state.filter.store=nv;save();render();}break;}
+  case 'ncost':{var nc2=needById(id);if(nc2){nc2.cost=Number(t.value);save();render();}break;}
+  case 'ncat':{var nc3=needById(id);if(nc3){nc3.category=t.value;save();render();}break;}
+  case 'nq':{var nq=needById(id);if(nq){nq.q[Number(t.getAttribute('data-k'))]=Number(t.value);save();render();}break;}
+  case 'newscat':{var wc=newsById(id);if(wc){wc.category=t.value;save();render();}break;}
+  case 'newsavail':{var wa=newsById(id);if(wa){wa.availability=t.value;save();render();}break;}
+ }
+});
+
+function renderListOnly(){
+ var pos=null,el=document.getElementById('searchinput');if(el)pos=el.selectionStart;
+ render();
+ var ne=document.getElementById('searchinput');if(ne){ne.focus();if(pos!=null){try{ne.setSelectionRange(pos,pos);}catch(e){}}}
+}
+
+app.addEventListener('keydown',function(e){
+ if(e.key==='Enter'&&e.target&&e.target.id==='newname'){e.preventDefault();addItem();}
+});
+
+var NEEDS_SEED=[
+{c:'house',n:'Hempcrete walls',d:'Breathable lime-and-hemp cast walls that store carbon and resist mold.',co:2,r:15,q:[9,9,7,8,5,7],s:[['Hempcrete — Wikipedia','https://en.wikipedia.org/wiki/Hempcrete'],['BuildingGreen','https://www.buildinggreen.com']]},
+{c:'house',n:'Reclaimed timber framing',d:'Salvaged structural wood with low embodied carbon and real character.',co:2,r:8,q:[8,9,6,9,7,9],s:[['FSC US','https://us.fsc.org'],['Reclaimed lumber — Wikipedia','https://en.wikipedia.org/wiki/Reclaimed_lumber']]},
+{c:'house',n:'Cork flooring',d:'Harvested bark that regrows; warm, quiet, resilient and antimicrobial.',co:1,r:10,q:[8,7,7,9,7,8],s:[['Cork (material) — Wikipedia','https://en.wikipedia.org/wiki/Cork_(material)'],['BuildingGreen','https://www.buildinggreen.com']]},
+{c:'house',n:'Lime plaster',d:'Vapor-open mineral plaster that buffers humidity and lasts generations.',co:2,r:12,q:[9,8,6,8,6,8],s:[['Lime plaster — Wikipedia','https://en.wikipedia.org/wiki/Lime_plaster'],['BuildingGreen','https://www.buildinggreen.com']]},
+{c:'house',n:'Straw-bale insulation',d:'Thick agricultural-byproduct walls with excellent thermal performance.',co:1,r:9,q:[9,7,9,8,7,6],s:[['Straw-bale construction — Wikipedia','https://en.wikipedia.org/wiki/Straw-bale_construction'],['DOE Energy Saver','https://www.energy.gov/energysaver/insulation']]},
+{c:'house',n:'Rammed earth walls',d:'Compacted earth walls with high thermal mass and striking natural strata.',co:3,r:20,q:[9,10,7,8,5,9],s:[['Rammed earth — Wikipedia','https://en.wikipedia.org/wiki/Rammed_earth'],['BuildingGreen','https://www.buildinggreen.com']]},
+{c:'house',n:'Natural clay paint',d:'Zero-VOC mineral paint that is breathable and fully compostable.',co:1,r:6,q:[10,6,5,8,7,8],s:[['EPA Indoor Air Quality','https://www.epa.gov/indoor-air-quality-iaq'],['Living Future Declare','https://living-future.org']]},
+{c:'house',n:'Sheep wool insulation',d:'Renewable batts that manage moisture and passively filter indoor air.',co:2,r:7,q:[9,7,8,9,5,6],s:[['DOE Energy Saver Insulation','https://www.energy.gov/energysaver/insulation'],['Wool insulation — Wikipedia','https://en.wikipedia.org/wiki/Wool_insulation']]},
+{c:'house',n:'Bamboo cabinetry',d:'Fast-renewing grass pressed into hard, handsome casework.',co:2,r:8,q:[7,7,6,8,7,8],s:[['Bamboo — Wikipedia','https://en.wikipedia.org/wiki/Bamboo'],['FSC US','https://us.fsc.org']]},
+{c:'house',n:'Natural linoleum',d:'Linseed-oil and cork flooring (Marmoleum): durable, biodegradable, colorful.',co:2,r:10,q:[8,8,6,9,7,7],s:[['Linoleum — Wikipedia','https://en.wikipedia.org/wiki/Linoleum'],['BuildingGreen','https://www.buildinggreen.com']]},
+
+{c:'energy',n:'Rooftop solar PV',d:'On-site clean electricity that offsets grid power for decades.',co:3,r:9,q:[7,8,10,7,8,6],s:[['DOE Guide to Going Solar','https://www.energy.gov/energysaver/homeowners-guide-going-solar'],['NREL','https://www.nrel.gov']]},
+{c:'energy',n:'Air-source heat pump',d:'High-efficiency electric heating and cooling in one system.',co:3,r:8,q:[7,7,10,7,8,6],s:[['ENERGY STAR Heat Pumps','https://www.energystar.gov'],['DOE Heat Pump Systems','https://www.energy.gov/energysaver/heat-pump-systems']]},
+{c:'energy',n:'Passive solar design',d:'Orientation, mass and glazing that harvest free winter heat.',co:1,r:6,q:[8,9,10,8,9,8],s:[['DOE Passive Solar','https://www.energy.gov/energysaver/passive-solar-home-design'],['Phius','https://www.phius.org']]},
+{c:'energy',n:'Home battery storage',d:'Stores solar for night use and rides through outages.',co:3,r:12,q:[6,7,8,6,5,6],s:[['NREL','https://www.nrel.gov'],['DOE Energy Saver','https://www.energy.gov/energysaver']]},
+{c:'energy',n:'Triple-glazed windows',d:'Three panes and warm-edge spacers slash heat loss and drafts.',co:3,r:15,q:[8,9,9,7,6,8],s:[['ENERGY STAR Windows','https://www.energystar.gov'],['DOE Windows','https://www.energy.gov/energysaver/windows-doors-and-skylights']]},
+{c:'energy',n:'Solar hot water',d:'Roof collectors preheat domestic water with sunshine.',co:2,r:7,q:[8,8,9,7,7,6],s:[['DOE Solar Water Heaters','https://www.energy.gov/energysaver/solar-water-heaters'],['NREL','https://www.nrel.gov']]},
+{c:'energy',n:'Heat-pump water heater',d:'Pulls heat from the air to make hot water at a fraction of the energy.',co:2,r:5,q:[7,7,10,7,9,6],s:[['ENERGY STAR','https://www.energystar.gov'],['DOE Heat Pump Water Heaters','https://www.energy.gov/energysaver/heat-pump-water-heaters']]},
+{c:'energy',n:'LED lighting throughout',d:'Uses a fraction of the power of incandescent and lasts for years.',co:1,r:2,q:[8,8,10,7,10,7],s:[['ENERGY STAR Lighting','https://www.energystar.gov'],['DOE LED Lighting','https://www.energy.gov/energysaver/led-lighting']]},
+{c:'energy',n:'Smart thermostat',d:'Learns your schedule and trims heating and cooling waste.',co:1,r:2,q:[7,7,8,6,9,7],s:[['ENERGY STAR','https://www.energystar.gov'],['DOE Thermostats','https://www.energy.gov/energysaver/thermostats']]},
+{c:'energy',n:'Dense-pack cellulose insulation',d:'Recycled-newsprint insulation that air-seals and buffers temperature.',co:1,r:5,q:[8,8,9,9,9,6],s:[['DOE Insulation','https://www.energy.gov/energysaver/insulation'],['Cellulose insulation — Wikipedia','https://en.wikipedia.org/wiki/Cellulose_insulation']]},
+
+{c:'water',n:'Rainwater harvesting',d:'Collects roof runoff in cisterns for irrigation and non-potable use.',co:2,r:8,q:[8,8,8,9,7,7],s:[['EPA Soak Up the Rain','https://www.epa.gov/soakuptherain'],['Rainwater harvesting — Wikipedia','https://en.wikipedia.org/wiki/Rainwater_harvesting']]},
+{c:'water',n:'Greywater recycling',d:'Reuses sink and shower water for the garden and toilets.',co:2,r:9,q:[7,7,8,9,7,6],s:[['EPA WaterSense','https://www.epa.gov/watersense'],['Greywater — Wikipedia','https://en.wikipedia.org/wiki/Greywater']]},
+{c:'water',n:'Low-flow fixtures',d:'Aerated taps and showerheads cut water use with no comfort loss.',co:1,r:2,q:[9,8,9,7,10,8],s:[['EPA WaterSense','https://www.epa.gov/watersense'],['DOE Energy Saver','https://www.energy.gov/energysaver']]},
+{c:'water',n:'Composting toilet',d:'Turns waste into soil while saving thousands of gallons a year.',co:2,r:6,q:[8,7,8,10,7,5],s:[['EPA WaterSense','https://www.epa.gov/watersense'],['Composting toilet — Wikipedia','https://en.wikipedia.org/wiki/Composting_toilet']]},
+{c:'water',n:'Native xeriscaping',d:'Drought-adapted native plants that need little water and feed pollinators.',co:1,r:4,q:[9,8,8,9,8,8],s:[['EPA WaterSense Landscaping','https://www.epa.gov/watersense/landscaping-tips'],['Xeriscaping — Wikipedia','https://en.wikipedia.org/wiki/Xeriscaping']]},
+{c:'water',n:'Drip irrigation',d:'Delivers water to roots with little evaporation or runoff.',co:1,r:3,q:[8,7,9,7,9,6],s:[['EPA WaterSense','https://www.epa.gov/watersense'],['Drip irrigation — Wikipedia','https://en.wikipedia.org/wiki/Drip_irrigation']]},
+{c:'water',n:'Rain garden / bioswale',d:'Planted basin that soaks up stormwater and recharges groundwater.',co:1,r:5,q:[9,8,7,9,7,9],s:[['EPA Soak Up the Rain','https://www.epa.gov/soakuptherain'],['Rain garden — Wikipedia','https://en.wikipedia.org/wiki/Rain_garden']]},
+{c:'water',n:'WaterSense appliances',d:'Certified washers and dishwashers that sip water and energy.',co:2,r:4,q:[8,8,9,7,9,7],s:[['EPA WaterSense','https://www.epa.gov/watersense'],['ENERGY STAR','https://www.energystar.gov']]},
+{c:'water',n:'Permeable paving',d:'Porous surfaces let rain infiltrate instead of running off.',co:2,r:10,q:[8,9,7,8,6,7],s:[['EPA Soak Up the Rain','https://www.epa.gov/soakuptherain'],['Permeable paving — Wikipedia','https://en.wikipedia.org/wiki/Permeable_paving']]},
+{c:'water',n:'Hot-water recirculation',d:'On-demand loop ends the wait for hot water and the wasted flow.',co:1,r:6,q:[7,7,8,6,7,6],s:[['DOE Water Heating','https://www.energy.gov/energysaver/water-heating'],['EPA WaterSense','https://www.epa.gov/watersense']]},
+
+{c:'air',n:'HRV / ERV ventilation',d:'Balanced fresh-air system that recovers heat from exhaust air.',co:2,r:10,q:[9,8,9,7,7,6],s:[['DOE Whole-House Ventilation','https://www.energy.gov/energysaver/whole-house-ventilation'],['EPA Indoor Air Quality','https://www.epa.gov/indoor-air-quality-iaq']]},
+{c:'air',n:'Low-VOC finishes',d:'Paints and sealants that off-gas little, keeping indoor air clean.',co:1,r:3,q:[10,7,6,7,8,8],s:[['EPA Indoor Air Quality','https://www.epa.gov/indoor-air-quality-iaq'],['Living Future Declare','https://living-future.org']]},
+{c:'air',n:'Radon mitigation system',d:'Sub-slab depressurization that vents a leading indoor carcinogen.',co:2,r:null,q:[10,9,7,6,7,5],s:[['EPA Radon','https://www.epa.gov/radon']]},
+{c:'air',n:'HEPA filtration',d:'Captures fine particulates, smoke and allergens from the air.',co:1,r:4,q:[8,7,7,6,7,6],s:[['EPA Indoor Air Quality','https://www.epa.gov/indoor-air-quality-iaq'],['HEPA — Wikipedia','https://en.wikipedia.org/wiki/HEPA']]},
+{c:'air',n:'Houseplants',d:'Living greenery that humidifies and softens interior spaces.',co:1,r:1,q:[8,6,5,9,9,9],s:[['EPA Indoor Air Quality','https://www.epa.gov/indoor-air-quality-iaq'],['NASA Clean Air Study — Wikipedia','https://en.wikipedia.org/wiki/NASA_Clean_Air_Study']]},
+{c:'air',n:'Cross-ventilation design',d:'Window placement that flushes heat and stale air for free.',co:1,r:3,q:[9,9,9,9,10,8],s:[['DOE Natural Ventilation','https://www.energy.gov/energysaver/natural-ventilation'],['Cross ventilation — Wikipedia','https://en.wikipedia.org/wiki/Cross_ventilation']]},
+{c:'air',n:'Natural-fiber textiles',d:'Wool, cotton and linen furnishings that avoid synthetic off-gassing.',co:2,r:5,q:[9,7,5,8,7,8],s:[['Living Future','https://living-future.org'],['Global Organic Textile Standard','https://global-standard.org']]},
+{c:'air',n:'Beeswax / soy candles',d:'Plant- and bee-based candles that skip paraffin soot.',co:1,r:null,q:[9,5,4,8,8,8],s:[['EPA Indoor Air Quality','https://www.epa.gov/indoor-air-quality-iaq']]},
+{c:'air',n:'Induction cooktop',d:'Fast electric cooking with no combustion byproducts indoors.',co:2,r:6,q:[9,8,9,7,7,8],s:[['ENERGY STAR','https://www.energystar.gov'],['DOE Energy Saver','https://www.energy.gov/energysaver']]},
+{c:'air',n:'All-electric appliances',d:'Removing gas lines eliminates indoor NO2 and combustion leaks.',co:2,r:7,q:[9,8,9,7,7,7],s:[['RMI','https://rmi.org'],['DOE Energy Saver','https://www.energy.gov/energysaver']]},
+
+{c:'waste',n:'Home compost system',d:'Turns kitchen and yard scraps into rich soil, diverting landfill waste.',co:1,r:2,q:[9,7,8,10,9,6],s:[['EPA Composting at Home','https://www.epa.gov/recycle/composting-home'],['Compost — Wikipedia','https://en.wikipedia.org/wiki/Compost']]},
+{c:'waste',n:'Worm bin (vermicompost)',d:'Compact indoor worms that process food scraps into castings.',co:1,r:2,q:[9,6,7,10,9,6],s:[['EPA Composting at Home','https://www.epa.gov/recycle/composting-home'],['Vermicompost — Wikipedia','https://en.wikipedia.org/wiki/Vermicompost']]},
+{c:'waste',n:'Bokashi fermentation',d:'Anaerobic bran system that pickles all food waste, even meat and dairy.',co:1,r:2,q:[8,6,7,10,8,5],s:[['Bokashi — Wikipedia','https://en.wikipedia.org/wiki/Bokashi_(horticulture)'],['EPA Composting at Home','https://www.epa.gov/recycle/composting-home']]},
+{c:'waste',n:'Built-in sorting station',d:'Dedicated bins that make recycling and composting effortless.',co:1,r:3,q:[8,8,7,9,9,7],s:[['EPA Recycling','https://www.epa.gov/recycle'],['EPA Sustainable Materials','https://www.epa.gov/smm']]},
+{c:'waste',n:'Repair & reuse station',d:'A tools-and-parts nook that keeps goods in use and out of the bin.',co:1,r:4,q:[9,8,6,10,9,7],s:[['EPA Sustainable Materials','https://www.epa.gov/smm'],['Ellen MacArthur Foundation','https://www.ellenmacarthurfoundation.org']]},
+{c:'waste',n:'Salvaged materials',d:'Reused doors, fixtures and lumber that cut demand and cost.',co:1,r:5,q:[8,8,6,10,8,8],s:[['EPA Sustainable Materials','https://www.epa.gov/smm'],['Deconstruction — Wikipedia','https://en.wikipedia.org/wiki/Deconstruction_(building)']]},
+{c:'waste',n:'Food-scrap digester',d:'Countertop unit that shrinks food waste into a dry soil amendment.',co:2,r:3,q:[7,6,7,9,7,5],s:[['EPA Composting at Home','https://www.epa.gov/recycle/composting-home']]},
+{c:'waste',n:'Design for disassembly',d:'Bolted, unglued assemblies that can be taken apart and reused.',co:2,r:15,q:[8,9,7,10,7,8],s:[['Ellen MacArthur Foundation','https://www.ellenmacarthurfoundation.org'],['Cradle to Cradle','https://c2ccertified.org']]},
+{c:'waste',n:'Bulk / refill pantry',d:'Refillable jars and dispensers that eliminate packaging waste.',co:1,r:2,q:[9,7,6,9,9,7],s:[['EPA Sustainable Materials','https://www.epa.gov/smm']]},
+{c:'waste',n:'Construction waste plan',d:'Sorting and recycling job-site debris keeps tons out of landfill.',co:1,r:1,q:[8,7,6,9,8,6],s:[['EPA Construction & Demolition','https://www.epa.gov/smm'],['USGBC LEED','https://www.usgbc.org/leed']]},
+
+{c:'transport',n:'EV charger (Level 2)',d:'Home charging that makes an electric car practical and cheap to fuel.',co:2,r:5,q:[8,8,9,7,7,7],s:[['DOE Energy Saver','https://www.energy.gov/energysaver'],['Alt Fuels Data Center','https://afdc.energy.gov']]},
+{c:'transport',n:'Secure bike storage',d:'Weatherproof, lockable storage that makes cycling the easy default.',co:1,r:4,q:[9,8,7,9,9,7],s:[['US DOT','https://www.transportation.gov'],['PeopleForBikes','https://www.peopleforbikes.org']]},
+{c:'transport',n:'E-bike',d:'Electric-assist bike that replaces car trips with near-zero energy.',co:2,r:3,q:[8,7,9,8,8,8],s:[['Electric bicycle — Wikipedia','https://en.wikipedia.org/wiki/Electric_bicycle'],['US DOT','https://www.transportation.gov']]},
+{c:'transport',n:'Walkable / bikeable siting',d:'Choosing a location where daily needs are a short walk or ride away.',co:1,r:6,q:[9,9,9,9,9,8],s:[['EPA Smart Growth','https://www.epa.gov/smartgrowth'],['US DOT','https://www.transportation.gov']]},
+{c:'transport',n:'Car-share access',d:'Shared vehicles that cover occasional needs without owning a car.',co:1,r:2,q:[7,7,8,9,9,6],s:[['US DOT','https://www.transportation.gov'],['Carsharing — Wikipedia','https://en.wikipedia.org/wiki/Carsharing']]},
+{c:'transport',n:'Battery-electric vehicle',d:'Zero-tailpipe car that runs cleanest when charged from your solar.',co:3,r:7,q:[7,8,9,6,6,7],s:[['DOE FuelEconomy','https://www.fueleconomy.gov'],['EPA Green Vehicles','https://www.epa.gov/greenvehicles']]},
+{c:'transport',n:'Cargo bike',d:'Hauls kids and groceries, replacing a second car for many families.',co:2,r:4,q:[9,7,8,8,7,8],s:[['PeopleForBikes','https://www.peopleforbikes.org'],['Freight bicycle — Wikipedia','https://en.wikipedia.org/wiki/Freight_bicycle']]},
+{c:'transport',n:'Electric scooter',d:'Compact last-mile transport for short urban trips.',co:1,r:2,q:[7,6,8,7,8,7],s:[['Electric scooters — Wikipedia','https://en.wikipedia.org/wiki/Electric_motorcycles_and_scooters'],['US DOT','https://www.transportation.gov']]},
+{c:'transport',n:'Solar carport',d:'Parking canopy that shades vehicles and generates charging power.',co:3,r:12,q:[7,8,9,7,6,7],s:[['NREL','https://www.nrel.gov'],['DOE Energy Saver','https://www.energy.gov/energysaver']]},
+{c:'transport',n:'Vehicle-to-home (V2H)',d:'Uses an EV battery to back up the house during outages.',co:3,r:10,q:[6,7,8,7,6,6],s:[['NREL','https://www.nrel.gov'],['DOE Energy Saver','https://www.energy.gov/energysaver']]}
+];
+function seedNeeds(){return NEEDS_SEED.map(function(o){return {id:uid(),category:o.c,name:o.n,desc:o.d,cost:o.co,roi:o.r,status:'idea',q:o.q.slice(),sources:o.s.map(function(x){return x.slice();})};});}
+function needById(id){return state.needs.find(function(x){return x.id===id;});}
+function avgQ(q){var s=0;for(var i=0;i<q.length;i++)s+=Number(q[i]||0);return s/q.length;}
+function ecoClsN(v){v=Number(v);return v>=9?'e-boldgreen':v>=7?'e-green':v>=4?'e-amber':'e-red';}
+function costStr(c){return c>=3?'$$$':c===2?'$$':'$';}
+function roiStr(r){return (r==null||r==='')?'ROI: varies':'ROI ~'+r+' yr'+(Number(r)===1?'':'s');}
+function qColor(v){v=Number(v);return v>=7?'#639922':v>=4?'#BA7517':'#E24B4A';}
+function statusMeta(k){return STATUSMETA[k]||STATUSMETA.idea;}
+function catMeta(k){for(var i=0;i<CATS.length;i++)if(CATS[i].key===k)return CATS[i];return CATS[0];}
+function scoreOptions(sel){var o='';for(var i=0;i<=10;i++)o+='<option value="'+i+'"'+(Number(sel)===i?' selected':'')+'>'+i+'</option>';return o;}
+function menuNav(){
+ function item(view,icon,label){var cur=state.view===view;return '<button class="navi" data-act="nav" data-v="'+view+'">'+ico(icon)+label+'<span class="soon'+(cur?' cur':'')+'">'+(cur?'Current':'Open')+'</span></button>';}
+ return item('consumables','basket','Consumables')+item('needs','home','Needs')+item('stores','store','Stores')+item('definitions','book','Definitions')+item('news','leaf','Sustainability news')+(cloud.user?('<button class="navi" data-act="signout">'+ico('user')+'Sign out<span class="soon">'+esc(cloud.user.email||'account')+'</span></button>'):'');
+}
+function renderNeeds(){
+ var tabs='<button class="tab'+(state.needsTab==='dashboard'?' on':'')+'" data-act="ntab" data-v="dashboard">'+ico('layoutDashboard')+'Dashboard</button>'+
+  CATS.map(function(c){return '<button class="tab'+(state.needsTab===c.key?' on':'')+'" data-act="ntab" data-v="'+c.key+'">'+ico(c.icon)+c.label+'</button>';}).join('');
+ var head='<div class="hd"><div class="brand"><span class="logo">'+ico('plant')+'</span><div><small>The Sustainable Home</small><b>Needs</b></div></div>'+
+  '<button class="iconbtn" data-act="openmenu" aria-label="Menu">'+ico('menu')+'</button></div>';
+ var body=state.needsTab==='dashboard'?needsDashboard():needsCategory(state.needsTab);
+ return head+'<div class="tabs">'+tabs+'</div>'+body;
+}
+function needsDashboard(){
+ var total=state.needs.length;
+ var done=state.needs.filter(function(x){return x.status==='done';}).length;
+ var planned=state.needs.filter(function(x){return x.status==='planned';}).length;
+ var pct=total?Math.round(done/total*100):0;
+ var ring='<svg viewBox="0 0 42 42" style="width:76px;height:76px;flex:none;"><circle cx="21" cy="21" r="16" fill="none" stroke="#EAE8DF" stroke-width="5"/><circle cx="21" cy="21" r="16" fill="none" stroke="#639922" stroke-width="5" stroke-dasharray="100 100" stroke-dashoffset="'+(100-pct)+'" stroke-linecap="round" transform="rotate(-90 21 21)"/><text x="21" y="20" text-anchor="middle" font-size="9" font-weight="600" fill="#173404">'+pct+'%</text><text x="21" y="27" text-anchor="middle" font-size="4" fill="#888780">done</text></svg>';
+ var overall='<div class="ncard" style="display:flex;align-items:center;gap:16px;margin-bottom:14px;">'+ring+
+   '<div style="flex:1;"><div style="font-size:14px;font-weight:500;color:var(--ink);">Your sustainable home</div>'+
+   '<div style="font-size:12px;color:var(--ink2);margin-top:2px;">'+total+' ideas · '+planned+' planned · '+done+' done</div>'+
+   '<div style="display:flex;gap:10px;margin-top:8px;font-size:11px;color:var(--ink2);">'+
+    '<span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#D3D1C7;"></span> Idea</span>'+
+    '<span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#EF9F27;"></span> Planned</span>'+
+    '<span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#639922;"></span> Done</span>'+
+   '</div></div></div>';
+ var rows=CATS.map(function(c){
+  var arr=state.needs.filter(function(x){return x.category===c.key;});
+  var t=arr.length,d=arr.filter(function(x){return x.status==='done';}).length,p=arr.filter(function(x){return x.status==='planned';}).length,i=t-d-p;
+  var dw=t?d/t*100:0,pw=t?p/t*100:0,iw=t?i/t*100:0;
+  return '<button class="progrow" data-act="ntab" data-v="'+c.key+'" style="display:block;width:100%;text-align:left;background:none;border:none;padding:0;margin-bottom:12px;cursor:pointer;">'+
+   '<div style="display:flex;align-items:center;gap:8px;font-size:14px;color:var(--ink);margin-bottom:5px;"><span style="color:#639922;display:inline-flex;">'+ico(c.icon)+'</span><span>'+c.label+'</span><span style="margin-left:auto;font-size:11px;color:var(--ink3);">'+t+' ideas</span></div>'+
+   '<div class="barwrap"><div style="width:'+dw+'%;background:#639922;"></div><div style="width:'+pw+'%;background:#EF9F27;"></div><div style="width:'+iw+'%;background:#D3D1C7;"></div></div></button>';
+ }).join('');
+ return overall+'<div class="slabel">By need</div>'+rows;
+}
+function needsCategory(cat){
+ var filter=state.needsFilter;
+ var arr=state.needs.filter(function(x){return x.category===cat&&(filter==='all'||x.status===filter);});
+ var chips=['all','idea','planned','done'].map(function(k){var lab=k==='all'?'All':statusMeta(k).label;return '<button class="schip'+(filter===k?' on':'')+'" data-act="nfilter" data-v="'+k+'">'+lab+'</button>';}).join('');
+ var sub='<div class="subrow">'+chips+'<button class="addlink" data-act="nadd" style="margin-left:auto;">'+ico('plus')+'Add</button></div>';
+ var list=arr.length?arr.map(needCard).join(''):'<p class="hint" style="padding:6px 2px">No ideas here yet. Tap Add to create one.</p>';
+ return sub+list;
+}
+function needCard(it){if(it.id===state.nEditingId)return needEdit(it);if(it.id===state.nExpandedId)return needExpanded(it);return needCollapsed(it);}
+function needCollapsed(it){
+ var sm=statusMeta(it.status),avg=avgQ(it.q);
+ return '<div class="ncard" data-act="nexpand" data-id="'+it.id+'" style="cursor:pointer;"><div class="ntop"><div><div class="nname">'+esc(it.name||'Untitled')+'</div><div class="ndesc">'+esc(it.desc)+'</div></div>'+
+  '<span class="eco '+ecoClsN(avg)+'">'+avg.toFixed(1)+'</span></div>'+
+  '<div class="nmeta"><span class="m">'+costStr(it.cost)+'</span><span class="m">'+esc(roiStr(it.roi))+'</span>'+
+  '<span class="spill" style="background:'+sm.bg+';color:'+sm.tx+';">'+sm.label+'</span>'+
+  '<span style="margin-left:auto;color:var(--ink3);display:inline-flex;">'+ico('chevronDown')+'</span></div></div>';
+}
+function needExpanded(it){
+ var sm=statusMeta(it.status),avg=avgQ(it.q);
+ var bars=QUAL.map(function(q,i){var v=it.q[i];return '<div><div class="qlab"><span>'+q[1]+'</span><span>'+v+'</span></div><div class="qbar"><div class="qfill" style="width:'+(v*10)+'%;background:'+qColor(v)+';"></div></div></div>';}).join('');
+ var seg='<div class="status-seg">'+['idea','planned','done'].map(function(k){var m=statusMeta(k),on=it.status===k;return '<button data-act="nstatus" data-id="'+it.id+'" data-v="'+k+'" class="'+(on?'on':'')+'" style="'+(on?'color:'+m.tx+';':'')+'">'+m.label+'</button>';}).join('')+'</div>';
+ var srcs=(it.sources&&it.sources.length)?('<div class="srcs"><div class="sh">Sources</div>'+it.sources.map(function(s){return '<a class="srcln" href="'+escA(s[1])+'" target="_blank" rel="noopener">'+ico('ext')+esc(s[0])+'</a>';}).join('')+'</div>'):'';
+ return '<div class="ncard exp"><div class="ntop" data-act="nexpand" data-id="'+it.id+'" style="cursor:pointer;"><div><div class="nname">'+esc(it.name||'Untitled')+'</div><div class="ndesc">'+esc(it.desc)+'</div></div>'+
+  '<span class="eco '+ecoClsN(avg)+'">'+avg.toFixed(1)+'</span></div>'+
+  '<div class="nmeta"><span class="m">'+costStr(it.cost)+' cost</span><span class="m">'+esc(roiStr(it.roi))+'</span></div>'+seg+
+  '<div class="qgrid">'+bars+'</div>'+srcs+
+  '<div class="erow2" style="margin-top:12px;"><button class="del" data-act="ndel" data-id="'+it.id+'">'+ico('trash')+' Remove</button>'+
+  '<button class="addlink" data-act="nedit" data-id="'+it.id+'">'+ico('edit')+' Edit</button></div></div>';
+}
+function needEdit(it){
+ var catOpts=CATS.map(function(c){return '<option value="'+c.key+'"'+(it.category===c.key?' selected':'')+'>'+c.label+'</option>';}).join('');
+ var costOpts=[[1,'$ (low)'],[2,'$$ (medium)'],[3,'$$$ (high)']].map(function(o){return '<option value="'+o[0]+'"'+(it.cost===o[0]?' selected':'')+'>'+o[1]+'</option>';}).join('');
+ var qfields=QUAL.map(function(q,i){return '<div class="f"><label>'+q[1]+'</label><select data-act="nq" data-id="'+it.id+'" data-k="'+i+'">'+scoreOptions(it.q[i])+'</select></div>';}).join('');
+ var srcRows=(it.sources||[]).map(function(s,si){return '<div style="display:flex;gap:6px;margin-bottom:6px;"><input data-act="nsrct" data-id="'+it.id+'" data-si="'+si+'" value="'+escA(s[0])+'" placeholder="Source title" style="flex:1;min-width:0;font-size:13px;background:var(--muted);border:.5px solid var(--border);border-radius:8px;padding:7px 10px;"/><input data-act="nsrcu" data-id="'+it.id+'" data-si="'+si+'" value="'+escA(s[1])+'" placeholder="https://" style="flex:1;min-width:0;font-size:13px;background:var(--muted);border:.5px solid var(--border);border-radius:8px;padding:7px 10px;"/><button data-act="nsrcdel" data-id="'+it.id+'" data-si="'+si+'" style="background:none;border:none;color:var(--ink3);cursor:pointer;">'+ico('x')+'</button></div>';}).join('');
+ return '<div class="ncard exp"><div class="erow"><input class="enm" data-act="nname" data-id="'+it.id+'" value="'+escA(it.name)+'" placeholder="Idea name"/><button class="lnk" data-act="ndone" data-id="'+it.id+'">'+ico('chevronUp')+'</button></div>'+
+  '<div class="f" style="margin-bottom:10px;"><label>Description</label><textarea data-act="ndesc" data-id="'+it.id+'" placeholder="What it is and why it helps...">'+esc(it.desc)+'</textarea></div>'+
+  '<div class="grid2"><div class="f"><label>Category</label><select data-act="ncat" data-id="'+it.id+'">'+catOpts+'</select></div>'+
+  '<div class="f"><label>Cost tier</label><select data-act="ncost" data-id="'+it.id+'">'+costOpts+'</select></div>'+
+  '<div class="f"><label>ROI (years)</label><input type="number" min="0" data-act="nroi" data-id="'+it.id+'" value="'+(it.roi==null?'':it.roi)+'" placeholder="e.g. 7"/></div></div>'+
+  '<div class="slabel" style="margin:6px 2px 8px;">Quality ratings (0-10)</div><div class="grid2">'+qfields+'</div>'+
+  '<div class="slabel" style="margin:12px 2px 8px;">Sources</div>'+srcRows+
+  '<button class="clearbtn" data-act="nsrcadd" data-id="'+it.id+'" style="margin:0 0 10px;">'+ico('plus')+' Add source</button>'+
+  '<div class="erow2"><button class="del" data-act="ndel" data-id="'+it.id+'">'+ico('trash')+' Delete</button><button class="done" data-act="ndone" data-id="'+it.id+'">Done</button></div></div>';
+}
+function defRow(t,range,desc){return '<div class="defrow"><span class="deftier">'+t+'</span><div><div style="font-size:14px;font-weight:500;color:var(--ink);">'+range+'</div><div style="font-size:12px;color:var(--ink2);margin-top:2px;">'+desc+'</div></div></div>';}
+function renderDefinitions(){
+ var low=Math.round(MED_INCOME/40),high=Math.round(MED_INCOME/8);
+ function money(n){return '$'+n.toLocaleString('en-US');}
+ var head='<div class="pagehd"><button class="backbtn" data-act="nav" data-v="consumables" aria-label="Back">'+ico('chevronLeft')+'</button><div class="brand"><span class="logo">'+ico('book')+'</span><div><small>The Sustainable Home</small><b>Definitions</b></div></div></div>';
+ var intro='<div class="slabel" style="margin:0 2px 6px;">Cost tiers</div><p style="margin:0 2px 6px;font-size:13px;color:var(--ink2);line-height:1.55;">Relative to the U.S. Census median household income ('+money(MED_INCOME)+' for '+MED_YEAR+'). They refresh once a year when new Census data is released (each September).</p>';
+ var rows='<div class="deflist">'+defRow('$','Under '+money(low),'Less than 1/40 of median household income.')+defRow('$$',money(low)+' - '+money(high),'Between 1/40 and 1/8 of median household income.')+defRow('$$$','Over '+money(high),'More than 1/8 of median household income.')+'</div>';
+ var roi='<div class="slabel" style="margin:18px 2px 6px;">ROI (years)</div><p style="margin:0 2px;font-size:13px;color:var(--ink2);line-height:1.55;">The typical number of years for energy, water, or durability savings to offset the added cost. It is an approximate planning estimate; actual payback varies by home, climate, utility rates, and incentives. Items without a direct monetary payback show "varies".</p>';
+ var src='<p class="hint" style="margin:16px 2px 0;font-size:12px;">Source: U.S. Census Bureau, Income in the United States: '+MED_YEAR+'.</p>';
+ return head+intro+rows+roi+src;
+}
+
+var NEWS_SEED=[
+{c:"transport",t:"Enphase unveils its IQ bidirectional EV charger",so:"Enphase",u:"https://investor.enphase.com/news-releases/news-release-details/enphase-energy-unveils-new-iq-bidirectional-ev-charger",bd:"Enphase's IQ bidirectional charger, due in the second half of 2026, will let an EV deliver up to 11.5 kW to back up a home and support the grid.",av:"soon",ago:2,vw:false},
+{c:"house",t:"2026 green home trends every US homeowner should know",so:"GH Builders",u:"https://ghbuildersusa.com/2026-green-home-trends-every-u-s-homeowner-should-know/",bd:"A homeowner-focused roundup of 2026 green building trends, from embodied-carbon-aware materials to smart energy autonomy.",av:"available",ago:3,vw:false},
+{c:"house",t:"Four sustainable construction trends to watch in 2026",so:"Trellis",u:"https://trellis.net/article/4-sustainable-construction-trends-2026/",bd:"Trellis highlights four shifts for 2026, including a growing focus on embodied carbon and lower-carbon building materials.",av:"available",ago:5,vw:false},
+{c:"energy",t:"2026 trends in sustainable building and energy management",so:"Sustainable Business Magazine",u:"https://sustainablebusinessmagazine.net/business-review/2026-trends-in-sustainable-building-energy-management/",bd:"An overview of where home energy is heading in 2026: heat pumps, battery storage, and increasingly grid-independent houses.",av:"available",ago:4,vw:false},
+{c:"waste",t:"A decade of advances in compostable, plastic-free packaging",so:"Applied research review",u:"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC12581126/",bd:"A review of starch-, cellulose- and seaweed-based packaging that composts instead of lingering as plastic waste.",av:"soon",ago:6,vw:false},
+{c:"energy",t:"Biwatt launches a modular sodium-ion home battery",so:"pv magazine",u:"https://www.pv-magazine.com/2026/07/01/biwatt-launches-modular-sodium-ion-residential-storage-system/",bd:"Biwatt's modular sodium-ion storage promises steadier voltage and more usable energy from a cobalt-free chemistry that is safer and cheaper than lithium.",av:"available",ago:4,vw:false},
+{c:"energy",t:"Accupower brings a sodium-ion battery to homes",so:"pv magazine",u:"https://www.pv-magazine.com/2026/03/03/austrias-accupower-launches-residential-sodium-ion-battery/",bd:"Austria's Accupower has moved its sodium-ion home and off-grid batteries into series production, offering a lithium-free option for backup power.",av:"soon",ago:125,vw:false},
+{c:"energy",t:"A closer look at CATL's new sodium-ion cell",so:"pv magazine",u:"https://www.pv-magazine.com/2026/04/20/a-closer-look-at-catls-new-sodium-ion-battery/",bd:"CATL details its first platform-based sodium-ion battery built for storage, with commercial deployment expected during 2026.",av:"soon",ago:77,vw:false},
+{c:"energy",t:"2026 home battery buyers guide",so:"Ecohome",u:"https://www.ecohome.net/en/guides/4179/2026-home-battery-buyers-guide-costs-sizing-and-top-systems-for-homeowners-and-pros/",bd:"A practical rundown of sizing, costs and payback for home battery backup, comparing the top systems available this year.",av:"available",ago:20,vw:false},
+{c:"house",t:"Living building materials head to market",so:"Applied Microbiology",u:"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10221549/",bd:"Mycelium biocomposites and microbially grown biocement, with far lower embodied carbon than concrete, are moving from the lab toward real buildings.",av:"future",ago:60,vw:false},
+{c:"house",t:"Bio-based materials can turn homes into carbon sinks",so:"Journal review",u:"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC12558847/",bd:"A review of plant-based construction finds that mass timber and plant-fibre materials can store more carbon than they emit.",av:"available",ago:40,vw:false},
+{c:"house",t:"Formaldehyde-free insulation for healthier walls",so:"NAHB",u:"https://www.nahb.org/blog/2024/09/sponsored-knauf",bd:"Knauf's Performance+ insulation is certified asthma- and allergy-friendly, formaldehyde-free and very low in VOC emissions.",av:"available",ago:92,vw:true},
+{c:"air",t:"The best zero-VOC paints for 2026",so:"The Good Trade",u:"https://www.thegoodtrade.com/features/eco-friendly-paints-for-your-home/",bd:"AFM Safecoat, Clare and Benjamin Moore Eco Spec lead a roundup of zero-VOC, Greenguard-certified paints for a healthier indoor coat.",av:"available",ago:3,vw:false},
+{c:"air",t:"Best air purifiers, tested for 2026",so:"Forbes",u:"https://www.forbes.com/sites/forbes-personal-shopper/article/best-air-purifier/",bd:"Reviewers rank the Rabbit Air A3 top, and note that only activated-carbon filters, not HEPA alone, capture gaseous VOCs.",av:"available",ago:15,vw:false},
+{c:"air",t:"Eight houseplants for cleaner indoor air",so:"Purified Air",u:"https://www.purifiedairductcleaning.com/post/the-8-best-plants-for-indoor-air-quality-in-2026-breathe-easier-today",bd:"A beginner-friendly list of resilient houseplants that add humidity and greenery to indoor spaces.",av:"available",ago:33,vw:false},
+{c:"consumables",t:"Best plastic-free kitchen swaps you can buy now",so:"One Green Planet",u:"https://www.onegreenplanet.org/vegan-food/best-plastic-free-zero-waste-kitchen-swaps-you-can-buy-on-amazon-in-2026/",bd:"A shopping list of plastic-free kitchen swaps, from beeswax wraps to compostable sponges, now easy to order online.",av:"available",ago:2,vw:false},
+{c:"consumables",t:"Ten refillable cleaning products for 2026",so:"The Good Trade",u:"https://www.thegoodtrade.com/features/refillable-cleaning-products/",bd:"Refill-first brands like Kinfill and Blueland cut single-use bottles by shipping concentrated tablets and reusable vessels.",av:"available",ago:12,vw:false},
+{c:"consumables",t:"Loop expands returnable, reusable packaging",so:"Seventh Generation",u:"https://www.seventhgeneration.com/blog/seventh-generation-comes-to-loop",bd:"TerraCycle's Loop delivers home and personal-care staples in durable packaging you return to be cleaned and refilled.",av:"available",ago:45,vw:true},
+{c:"consumables",t:"Nine best zero-waste online stores",so:"The Roundup",u:"https://theroundup.org/best-zero-waste-online-stores/",bd:"A guide to shopping plastic-free online, spanning bulk pantry goods, refills and package-free personal care.",av:"available",ago:24,vw:false},
+{c:"water",t:"Greywater systems in 2026: costs and permits",so:"Rainplan",u:"https://myrainplan.com/blog/greywater-system/",bd:"Laundry-to-landscape kits from 200 to 700 dollars and simplified permits are making household greywater reuse much easier.",av:"available",ago:5,vw:false},
+{c:"water",t:"Pairing rainwater and greywater cuts household water use",so:"IWA Publishing",u:"https://iwaponline.com/ws/article/23/10/4112/97584/Integrated-systems-for-rainwater-harvesting-and",bd:"A systematic review finds that combining rainwater harvesting with greywater reuse can sharply reduce reliance on municipal water.",av:"available",ago:70,vw:false},
+{c:"transport",t:"Field tests show your EV can back up your home",so:"arXiv",u:"https://arxiv.org/pdf/2308.13624",bd:"Residential bidirectional (vehicle-to-home) chargers tested in the field can power a house during outages and shave peak costs.",av:"soon",ago:65,vw:false},
+{c:"waste",t:"Smarter home food-waste recycling systems",so:"Applied research",u:"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10857120/",bd:"New user-centric designs pair sensors and apps with composting to cut the roughly 2,200 dollars of food an average household wastes yearly.",av:"soon",ago:35,vw:false}
+];
+function seedNews(){return NEWS_SEED.map(function(o){return {id:uid(),title:o.t,source:o.so,url:o.u,body:o.bd,category:o.c,availability:o.av,publishedAt:Date.now()-o.ago*86400000,viewed:!!o.vw,added:false};});}
+function mergeNews(stored,seed){var byUrl={};stored.forEach(function(a){if(a.url)byUrl[a.url]=true;});var merged=stored.slice();seed.forEach(function(s){if(!byUrl[s.url])merged.push(s);});return merged;}
+function newsById(id){return state.news.find(function(x){return x.id===id;});}
+function newsCatMeta(k){for(var i=0;i<NEWSCATS.length;i++)if(NEWSCATS[i].key===k)return NEWSCATS[i];return NEWSCATS[1];}
+function newness(a){if(a.viewed)return 'viewed';return (Date.now()-a.publishedAt)<=7*86400000?'new':'unviewed';}
+function newnessRank(a){var n=newness(a);return n==='new'?0:n==='unviewed'?1:2;}
+function newsSorted(arr){var s=state.newsSort,a=arr.slice();if(s==='old')a.sort(function(x,y){return x.publishedAt-y.publishedAt;});else if(s==='unread')a.sort(function(x,y){return (newnessRank(x)-newnessRank(y))||(y.publishedAt-x.publishedAt);});else a.sort(function(x,y){return y.publishedAt-x.publishedAt;});return a;}
+function timeAgo(ts){var d=Math.floor((Date.now()-ts)/86400000);if(d<1)return 'today';if(d<7)return d+'d';if(d<30)return Math.floor(d/7)+'w';if(d<365)return Math.floor(d/30)+'mo';return Math.floor(d/365)+'y';}
+function sortLabel(){return state.newsSort==='old'?'Oldest':state.newsSort==='unread'?'Unread first':'Newest';}
+function newsChip(act,v,label,on){return '<button class="schip'+(on?' on':'')+'" data-act="'+act+'" data-v="'+v+'">'+label+'</button>';}
+function newsChipIcon(act,v,label,icon,on){return '<button class="schip'+(on?' on':'')+'" data-act="'+act+'" data-v="'+v+'" style="display:flex;align-items:center;gap:4px;">'+ico(icon)+label+'</button>';}
+function newsFilters(){
+ var cat='<div style="font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink3);margin:0 2px 5px;">Category</div><div class="subrow">'+newsChip('newsfiltcat','all','All',state.newsFilterCat==='all')+NEWSCATS.map(function(cc){return newsChipIcon('newsfiltcat',cc.key,cc.label,cc.icon,state.newsFilterCat===cc.key);}).join('')+'</div>';
+ var av='<div style="font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink3);margin:0 2px 5px;">Availability</div><div class="subrow" style="margin-bottom:12px;">'+newsChip('newsfiltavail','all','All',state.newsFilterAvail==='all')+Object.keys(AVAIL).map(function(k){return newsChip('newsfiltavail',k,AVAIL[k].label,state.newsFilterAvail===k);}).join('')+'</div>';
+ return cat+av;
+}
+function addBtnHTML(a){var isc=a.category==='consumables';var lab=isc?'Add to list':'Add to ideas';var ic=isc?'basket':'bulb';return a.added?'<span class="addbtn done">'+ico('check')+'Added</span>':'<button class="addbtn" data-act="newsact" data-id="'+a.id+'">'+ico(ic)+lab+'</button>';}
+function newsCollapsed(a){
+ var nw=newness(a),nm=NEWNESS[nw],av=AVAIL[a.availability],cm=newsCatMeta(a.category);
+ var right=nw==='new'?'<span class="newbadge">NEW</span>':'<span style="font-size:11px;color:'+nm.color+';display:flex;align-items:center;gap:4px;white-space:nowrap;">'+(nw==='viewed'?ico('eye'):'<span style="width:7px;height:7px;border-radius:50%;background:'+nm.color+';display:inline-block;"></span>')+nm.label+'</span>';
+ return '<div class="newscard" data-act="newsexpand" data-id="'+a.id+'">'+
+  '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;"><div class="nsrc">'+esc(a.source)+' · '+timeAgo(a.publishedAt)+'</div>'+right+'</div>'+
+  '<div class="ntitle" style="margin-top:3px;">'+esc(a.title||'Untitled')+'</div>'+
+  '<div class="nbody clamp">'+esc(a.body)+'</div>'+
+  '<div style="display:flex;align-items:center;gap:6px;margin-top:10px;flex-wrap:wrap;"><span class="catpill"><span style="display:inline-flex;">'+ico(cm.icon)+'</span>'+cm.label+'</span>'+
+   '<span class="spill" style="background:'+av.bg+';color:'+av.tx+';">'+av.label+'</span>'+
+   '<span style="margin-left:auto;">'+addBtnHTML(a)+'</span></div></div>';
+}
+function newsExpanded(a){
+ var nw=newness(a),nm=NEWNESS[nw],av=AVAIL[a.availability],cm=newsCatMeta(a.category);
+ return '<div class="newscard exp">'+
+  '<div style="display:flex;justify-content:space-between;align-items:center;"><div class="nsrc">'+esc(a.source)+' · '+timeAgo(a.publishedAt)+'</div><span style="font-size:11px;color:'+nm.color+';">'+nm.label+'</span></div>'+
+  '<div class="ntitle" style="font-size:16px;margin-top:4px;">'+esc(a.title||'Untitled')+'</div>'+
+  '<div class="nbody" style="margin-top:8px;">'+esc(a.body)+'</div>'+
+  (a.url?'<a class="srclink" href="'+escA(a.url)+'" target="_blank" rel="noopener">'+ico('ext')+'Read at '+esc(a.source||'source')+'</a>':'')+
+  '<div style="display:flex;align-items:center;gap:6px;margin-top:12px;flex-wrap:wrap;"><span class="catpill"><span style="display:inline-flex;">'+ico(cm.icon)+'</span>'+cm.label+'</span><span class="spill" style="background:'+av.bg+';color:'+av.tx+';">'+av.label+'</span><span style="margin-left:auto;">'+addBtnHTML(a)+'</span></div>'+
+  '<div class="erow2" style="margin-top:12px;"><button class="del" data-act="newsdel" data-id="'+a.id+'">'+ico('trash')+' Remove</button><span><button class="addlink" data-act="newsedit" data-id="'+a.id+'" style="margin-right:14px;">'+ico('edit')+' Edit tags</button><button class="addlink" data-act="newscollapse" data-id="'+a.id+'">Collapse '+ico('chevronUp')+'</button></span></div></div>';
+}
+function newsEdit(a){
+ var catOpts=NEWSCATS.map(function(cc){return '<option value="'+cc.key+'"'+(a.category===cc.key?' selected':'')+'>'+cc.label+'</option>';}).join('');
+ var avOpts=Object.keys(AVAIL).map(function(k){return '<option value="'+k+'"'+(a.availability===k?' selected':'')+'>'+AVAIL[k].label+'</option>';}).join('');
+ return '<div class="newscard exp"><div class="erow"><input class="enm" data-act="newstitle" data-id="'+a.id+'" value="'+escA(a.title)+'" placeholder="Article title"/><button class="lnk" data-act="newsdone" data-id="'+a.id+'">'+ico('chevronUp')+'</button></div>'+
+  '<div class="grid2"><div class="f"><label>Source</label><input data-act="newssource" data-id="'+a.id+'" value="'+escA(a.source)+'" placeholder="Publication"/></div>'+
+  '<div class="f"><label>Category</label><select data-act="newscat" data-id="'+a.id+'">'+catOpts+'</select></div>'+
+  '<div class="f"><label>Availability</label><select data-act="newsavail" data-id="'+a.id+'">'+avOpts+'</select></div>'+
+  '<div class="f"><label>URL</label><input data-act="newsurl" data-id="'+a.id+'" value="'+escA(a.url)+'" placeholder="https://"/></div></div>'+
+  '<div class="f" style="margin-bottom:10px;"><label>Summary</label><textarea data-act="newsbody" data-id="'+a.id+'" placeholder="Short summary...">'+esc(a.body)+'</textarea></div>'+
+  '<div class="erow2"><button class="del" data-act="newsdel" data-id="'+a.id+'">'+ico('trash')+' Delete</button><button class="done" data-act="newsdone" data-id="'+a.id+'">Done</button></div></div>';
+}
+function newsCard(a){if(a.id===state.newsEditingId)return newsEdit(a);if(a.id===state.newsExpandedId)return newsExpanded(a);return newsCollapsed(a);}
+function renderNews(){
+ var head='<div class="hd"><div class="brand"><span class="logo">'+ico('plant')+'</span><div><small>The Sustainable Home</small><b>News</b></div></div><button class="iconbtn" data-act="openmenu" aria-label="Menu">'+ico('menu')+'</button></div>';
+ var barrow='<div style="display:flex;align-items:center;margin:0 2px 12px;gap:8px;"><span style="font-size:11px;color:var(--ink3);display:flex;align-items:center;gap:5px;"><span style="color:#639922;display:inline-flex;">'+ico('refresh')+'</span>Auto-updates daily</span><button class="addlink" data-act="newssortopen" style="margin-left:auto;">'+ico('sort')+' '+sortLabel()+'</button><button class="addlink" data-act="newsaddnew">'+ico('plus')+'Add</button></div>';
+ var arr=state.news.filter(function(a){return (state.newsFilterCat==='all'||a.category===state.newsFilterCat)&&(state.newsFilterAvail==='all'||a.availability===state.newsFilterAvail);});
+ arr=newsSorted(arr);
+ var feed=arr.length?arr.map(newsCard).join(''):'<p class="hint" style="padding:6px 2px">No articles match. Try clearing filters.</p>';
+ return head+barrow+newsFilters()+feed;
+}
+
+function mapItemRow(it){return {id:it.id,user_id:cloud.user.id,name:it.name,type:it.type,freq_unit:it.freqUnit||'weekly',freq_days:it.freqDays||7,tag:it.tag||'',store:it.store||'',eco:(it.eco===''||it.eco==null)?null:Number(it.eco),checked:!!it.checked,checked_at:it.checkedAt?new Date(it.checkedAt).toISOString():null,created_at:it.createdAt?new Date(it.createdAt).toISOString():new Date().toISOString()};}
+function rowItem(r){return {id:r.id,name:r.name,type:r.type,freqUnit:r.freq_unit,freqDays:r.freq_days,tag:r.tag,store:r.store,eco:(r.eco==null?'':r.eco),checked:r.checked,checkedAt:r.checked_at?Date.parse(r.checked_at):null,createdAt:r.created_at?Date.parse(r.created_at):Date.now()};}
+function mapStoreRow(s){return {id:s.id,user_id:cloud.user.id,name:s.name||'',eco:(s.eco===''||s.eco==null)?null:Number(s.eco),category:s.category||'',note:s.note||''};}
+function rowStore(r){return {id:r.id,name:r.name,eco:(r.eco==null?'':r.eco),category:r.category||'',note:r.note||''};}
+function mapNeedRow(n){return {id:n.id,user_id:cloud.user.id,category:n.category,name:n.name||'',description:n.desc||'',cost:n.cost||2,roi:(n.roi==null||n.roi==='')?null:Number(n.roi),status:n.status||'idea',q:n.q||[5,5,5,5,5,5],sources:n.sources||[]};}
+function rowNeed(r){return {id:r.id,category:r.category,name:r.name,desc:r.description,cost:r.cost,roi:r.roi,status:r.status,q:r.q||[5,5,5,5,5,5],sources:r.sources||[]};}
+function mapNewsRow(a){return {id:a.id,user_id:cloud.user.id,title:a.title||'',source:a.source||'',url:a.url||'',body:a.body||'',category:a.category||'house',availability:a.availability||'available',published_at:a.publishedAt?new Date(a.publishedAt).toISOString():new Date().toISOString(),viewed:!!a.viewed,added:!!a.added};}
+function rowNews(r){return {id:r.id,title:r.title,source:r.source,url:r.url,body:r.body,category:r.category,availability:r.availability,publishedAt:r.published_at?Date.parse(r.published_at):Date.now(),viewed:r.viewed,added:r.added};}
+function renderLogin(){
+ return '<div style="max-width:360px;margin:44px auto 0;text-align:center;">'+
+  '<div style="width:56px;height:56px;border-radius:50%;background:var(--leaf);display:flex;align-items:center;justify-content:center;color:var(--greentx);margin:0 auto 14px;font-size:26px;">'+ico('plant')+'</div>'+
+  '<div style="font-size:20px;font-weight:500;color:var(--ink);">The Sustainable Home</div>'+
+  '<div style="font-size:13px;color:var(--ink2);margin:6px 0 20px;line-height:1.5;">Sign in to sync your list, stores, ideas, and news across devices.</div>'+
+  (cloud.authMsg?'<div style="font-size:12px;color:var(--greentx);background:var(--greenbg);border-radius:8px;padding:9px 11px;margin-bottom:12px;">'+esc(cloud.authMsg)+'</div>':'')+
+  '<input data-act="authemail" value="'+escA(cloud.authEmail)+'" placeholder="you@email.com" inputmode="email" style="width:100%;height:42px;border:.5px solid var(--border);border-radius:10px;padding:0 12px;font-size:15px;margin-bottom:10px;box-sizing:border-box;"/>'+
+  '<button class="done" data-act="sendmagic" style="width:100%;padding:12px;border-radius:10px;font-size:14px;">Email me a magic link</button>'+
+  '<div style="margin-top:14px;"><button class="addlink" data-act="skipauth" style="margin:0 auto;">Use without signing in</button></div>'+
+ '</div>';
+}
+async function initAuth(){
+ try{
+  var g=await sb.auth.getSession();
+  if(g.data&&g.data.session){cloud.user=g.data.session.user;await pullAll();}
+  render();
+  sb.auth.onAuthStateChange(function(ev,session){
+   if(session&&session.user){ if(!cloud.user){cloud.user=session.user;cloud.authMsg='';pullAll().then(render);} }
+   else { cloud.user=null; render(); }
+  });
+ }catch(e){ cloud.enabled=false; render(); }
+}
+async function pullAll(){
+ try{
+  var uid=cloud.user.id;
+  var r=await Promise.all([
+   sb.from('consumables_items').select('*').eq('user_id',uid),
+   sb.from('stores').select('*').eq('user_id',uid),
+   sb.from('needs_ideas').select('*').eq('user_id',uid),
+   sb.from('news_articles').select('*').eq('user_id',uid),
+   sb.from('profiles').select('*').eq('id',uid).maybeSingle()
+  ]);
+  var items=r[0].data||[],stores=r[1].data||[],needs=r[2].data||[],news=r[3].data||[],prof=r[4].data;
+  if(items.length===0&&stores.length===0&&needs.length===0&&news.length===0){
+   await pushAll();
+  } else {
+   state.items=items.map(rowItem);
+   state.stores=stores.map(rowStore);
+   state.needs=needs.map(rowNeed);
+   state.news=news.map(rowNews);
+   if(prof){ if(prof.consumables_sort)state.sort=prof.consumables_sort; if(prof.news_sort)state.newsSort=prof.news_sort; }
+   save();
+  }
+ }catch(e){}
+}
+var _syncT=null;
+function cloudSync(){ if(!cloud.user)return; if(_syncT)clearTimeout(_syncT); _syncT=setTimeout(function(){pushAll();},1200); }
+async function syncTable(name,rows,uid){
+ if(rows.length){ await sb.from(name).upsert(rows); }
+ var ids=rows.map(function(r){return r.id;});
+ var del=sb.from(name).delete().eq('user_id',uid);
+ if(ids.length){ del=del.not('id','in','('+ids.join(',')+')'); }
+ await del;
+}
+async function pushAll(){
+ if(!cloud.user)return;
+ try{
+  var uid=cloud.user.id;
+  await Promise.all([
+   syncTable('consumables_items',state.items.map(mapItemRow),uid),
+   syncTable('stores',state.stores.map(mapStoreRow),uid),
+   syncTable('needs_ideas',state.needs.map(mapNeedRow),uid),
+   syncTable('news_articles',state.news.map(mapNewsRow),uid),
+   sb.from('profiles').upsert({id:uid,consumables_sort:state.sort,news_sort:state.newsSort})
+  ]);
+ }catch(e){}
+}
+
+load();
+if(cloud.enabled){initAuth();}
+render();
+setInterval(function(){if(!state.overlay&&!state.editingId&&state.view==='consumables'){refreshRecurring();render();}},60000);
+</script>
+</body>
+</html>
