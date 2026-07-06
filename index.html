@@ -56,6 +56,19 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--green2);outline-
 .item.done{background:var(--muted);opacity:.62}
 .cb{width:30px;height:30px;border-radius:50%;border:2px solid var(--green2);flex:none;background:transparent;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;padding:0}
 .cb.on{background:var(--green2);border-color:var(--green2)}
+.cb.sq{border-radius:7px}
+.item.bsel{background:var(--greenbg)}
+.bulkbar{display:flex;align-items:center;gap:10px;padding:8px 4px;margin-top:6px;border-bottom:.5px solid var(--border)}
+.bulkall{background:none;border:none;padding:0;font-size:14px;color:var(--ink);cursor:pointer}
+.bulkcount{margin-left:auto;font-size:12px;color:var(--ink3)}
+.bulkedit{display:flex;align-items:center;gap:5px;padding:7px 12px;font-size:13px}
+.bulkedit[disabled]{opacity:.45;pointer-events:none}
+.bulkform .f{margin-bottom:12px}
+.bulknote{font-size:12px;color:var(--ink2);background:var(--greenbg);border-radius:8px;padding:9px 11px;margin:0 0 14px}
+.bulkkeep{background:var(--card);border:.5px solid var(--border);border-radius:8px;padding:10px 11px;font-size:13px;color:var(--ink2);width:100%;text-align:left;cursor:pointer}
+.bulkactions{display:flex;gap:10px;margin-top:6px}
+.bulkactions>button{flex:1}
+.bulkactions .done[disabled]{opacity:.45;pointer-events:none}
 .body{flex:1;min-width:0;cursor:pointer}
 .nm{font-size:15px;font-weight:500;color:var(--ink)}
 .item.done .nm{color:var(--ink2);text-decoration:line-through}
@@ -220,6 +233,7 @@ Object.assign(P,{
  eye:'<path d="M12 5c-5 0 -9 4 -10 7c1 3 5 7 10 7s9 -4 10 -7c-1 -3 -5 -7 -10 -7z"/><circle cx="12" cy="12" r="2.5"/>'
 });
 Object.assign(P,{user:'<circle cx="12" cy="8" r="4"/><path d="M4 20a8 8 0 0 1 16 0"/>'});
+Object.assign(P,{listCheck:'<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 12l2 2l4 -4"/>'});
 function ico(n){
  if(n==='onetime'){return '<svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><text x="12" y="16" text-anchor="middle" font-size="12" font-family="var(--font)">1</text></svg>';}
  return '<svg class="ic" viewBox="0 0 24 24">'+(P[n]||'')+'</svg>';
@@ -247,6 +261,7 @@ var state={
  editingId:null, detailsOpen:false, newName:'',
  draft:{type:'regular',store:'',freqUnit:'weekly',freqDays:30,tag:'',eco:''},
  overlay:null, view:'consumables',
+ bulkMode:false, bulkSel:{}, bulkDraft:{type:'__keep__',store:'__keep__',eco:'__keep__',tagOn:false,tag:''},
  needsTab:'dashboard', needsFilter:'all', needs:[], nEditingId:null, nExpandedId:null,
  newsFilterCat:'all', newsFilterAvail:'all', newsSort:'new', news:[], newsExpandedId:null, newsEditingId:null
 };
@@ -364,6 +379,19 @@ function draftForm(){
  '</div>';
 }
 
+function visibleIds(g){return g.unchecked.concat(g.purchased,g.archive).map(function(i){return i.id;});}
+function bulkSelCount(){return Object.keys(state.bulkSel).filter(function(k){return state.bulkSel[k];}).length;}
+function bulkBar(g){
+ var ids=visibleIds(g);
+ var n=bulkSelCount();
+ var allSel=ids.length>0&&ids.every(function(id){return state.bulkSel[id];});
+ return '<div class="bulkbar">'+
+  '<button class="cb sq'+(allSel?' on':'')+'" data-act="bulkselall" aria-label="Select all">'+(allSel?ico('check'):'')+'</button>'+
+  '<button class="bulkall" data-act="bulkselall">'+(allSel?'Deselect all':'Select all')+'</button>'+
+  '<span class="bulkcount">'+n+' selected</span>'+
+  '<button class="done bulkedit" data-act="bulkopen"'+(n?'':' disabled')+'>'+ico('edit')+'Edit</button>'+
+ '</div>';
+}
 function rowDisplay(it){
  var m=TYPEMETA[it.type];
  var meta=[];
@@ -371,6 +399,14 @@ function rowDisplay(it){
  if(it.tag)meta.push(esc(trunc(it.tag)));
  if(it.type==='recurring')meta.push(freqAbbr(it));
  var badge=(it.eco===''||it.eco==null)?'':'<span class="eco '+ecoCls(it.eco)+'">'+it.eco+'</span>';
+ if(state.bulkMode){
+  var sel=!!state.bulkSel[it.id];
+  return '<div class="item'+(sel?' bsel':'')+'">'+
+   '<button class="cb sq'+(sel?' on':'')+'" data-act="bulktoggle" data-id="'+it.id+'" aria-label="Select item">'+(sel?ico('check'):'')+'</button>'+
+   '<div class="body" data-act="bulktoggle" data-id="'+it.id+'"><div class="nm">'+esc(it.name)+'</div>'+(meta.length?'<div class="mt">'+meta.join(' · ')+'</div>':'')+'</div>'+
+   '<span class="ty'+(m.green?' green':'')+'" title="'+m.label+'">'+ico(m.ic)+'</span>'+badge+
+  '</div>';
+ }
  return '<div class="item'+(it.checked?' done':'')+'">'+
   '<button class="cb'+(it.checked?' on':'')+'" data-act="toggle" data-id="'+it.id+'" aria-label="Mark purchased">'+(it.checked?ico('check'):'')+'</button>'+
   '<div class="body" data-act="edit" data-id="'+it.id+'"><div class="nm">'+esc(it.name)+'</div>'+(meta.length?'<div class="mt">'+meta.join(' · ')+'</div>':'')+'</div>'+
@@ -423,6 +459,31 @@ function overlayHTML(){
   return ovlWrap('Menu',nav);
  }
  if(state.overlay==='newssort'){var so=[['new','Newest first'],['old','Oldest first'],['unread','Unread first']];return ovlWrap('Sort by newness',so.map(function(o){return '<button class="opt" data-act="setnewssort" data-v="'+o[0]+'">'+o[1]+(state.newsSort===o[0]?'<span class="chk">'+ico('check')+'</span>':'')+'</button>';}).join(''));
+ }
+ if(state.overlay==='bulkedit'){
+  var bd=state.bulkDraft;
+  var n=bulkSelCount();
+  var typeSel='<select data-act="bulktype"><option value="__keep__"'+(bd.type==='__keep__'?' selected':'')+'>Leave unchanged</option>'+
+    ['onetime','regular','recurring'].map(function(t){return '<option value="'+t+'"'+(bd.type===t?' selected':'')+'>'+TYPEMETA[t].label+'</option>';}).join('')+'</select>';
+  var storeSel='<select data-act="bulkstore"><option value="__keep__"'+(bd.store==='__keep__'?' selected':'')+'>Leave unchanged</option>'+
+    '<option value=""'+(bd.store===''?' selected':'')+'>No store</option>'+
+    storeNames().map(function(s){return '<option'+(s===bd.store?' selected':'')+'>'+esc(s)+'</option>';}).join('')+'</select>';
+  var ecoSel='<select data-act="bulkeco"><option value="__keep__"'+(bd.eco==='__keep__'?' selected':'')+'>Leave unchanged</option>'+
+    '<option value=""'+(bd.eco===''?' selected':'')+'>Not rated</option>';
+  for(var ei=0;ei<=10;ei++){ecoSel+='<option value="'+ei+'"'+(String(bd.eco)===String(ei)?' selected':'')+'>'+ei+'</option>';}
+  ecoSel+='</select>';
+  var tagField=bd.tagOn
+    ? '<div style="display:flex;gap:8px;align-items:center;"><input data-act="bulktag" maxlength="40" value="'+escA(bd.tag)+'" placeholder="New tag (blank clears)" style="flex:1"/><button class="bulkkeep" data-act="bulktagon">Keep</button></div>'
+    : '<button class="bulkkeep" data-act="bulktagon">Tag left unchanged — tap to change</button>';
+  var bbody='<div class="bulkform">'+
+   '<p class="bulknote">Applies to '+n+' selected item'+(n===1?'':'s')+'. Fields left unchanged keep each item’s current value.</p>'+
+   '<div class="f"><label>Type</label>'+typeSel+'</div>'+
+   '<div class="f"><label>Store</label>'+storeSel+'</div>'+
+   '<div class="f"><label>Tag</label>'+tagField+'</div>'+
+   '<div class="f"><label>Eco rating</label>'+ecoSel+'</div>'+
+   '<div class="bulkactions"><button class="clearbtn" data-act="closeovl">Cancel</button><button class="done" data-act="bulkapply"'+(n?'':' disabled')+'>Apply to '+n+'</button></div>'+
+  '</div>';
+  return ovlWrap('Bulk edit',bbody);
  }
  return '';
 }
@@ -480,6 +541,7 @@ function render(){
  '<div class="frow">'+
   '<div class="pills">'+pills+'</div>'+
   '<div class="tools">'+
+   '<button class="iconbtn'+(state.bulkMode?' act':'')+'" data-act="bulkmode" aria-label="Bulk edit" title="Bulk edit">'+ico('listCheck')+'</button>'+
    '<button class="iconbtn'+(state.searchOpen?' act':'')+'" data-act="togglesearch" aria-label="Search">'+ico('search')+'</button>'+
    '<button class="iconbtn" data-act="opensort" aria-label="Sort">'+ico('sort')+'</button>'+
    '<button class="iconbtn'+(anyFilter?' act':'')+'" data-act="openfilter" aria-label="Filter">'+ico('filter')+'</button>'+
@@ -490,6 +552,7 @@ function render(){
  if(state.items.length===0){
   html+='<div class="empty"><div class="big">'+ico('basket')+'</div><p style="font-weight:500;color:var(--ink)">Start your list</p><p>Add an item above. Choose One time, Regular, or Recurring, and rate how sustainable it is.</p></div>';
  } else {
+  if(state.bulkMode)html+=bulkBar(g);
   html+='<div class="slabel">To buy · '+g.unchecked.length+'</div>';
   html+='<div class="list">'+(g.unchecked.length?g.unchecked.map(row).join(''):'<p class="hint" style="padding:6px 2px">Nothing to buy right now.</p>')+'</div>';
   html+='<div class="uncheck"><span class="ln"></span>'+
@@ -571,6 +634,12 @@ app.addEventListener('click',function(e){
   case 'togglearchive':state.archiveOpen=!state.archiveOpen;render();break;
   case 'uncheckall':state.items.forEach(function(i){if(i.checked&&i.type!=='onetime')i.checked=false;});save();render();break;
   case 'toggle':if(it){it.checked=!it.checked;if(it.checked)it.checkedAt=Date.now();save();render();}break;
+  case 'bulkmode':state.bulkMode=!state.bulkMode;if(!state.bulkMode)state.bulkSel={};render();break;
+  case 'bulktoggle':if(id){if(state.bulkSel[id])delete state.bulkSel[id];else state.bulkSel[id]=true;render();}break;
+  case 'bulkselall':{var gg=groups();var vids=visibleIds(gg);var allS=vids.length>0&&vids.every(function(x){return state.bulkSel[x];});vids.forEach(function(x){if(allS)delete state.bulkSel[x];else state.bulkSel[x]=true;});render();break;}
+  case 'bulkopen':if(bulkSelCount()>0){state.overlay='bulkedit';render();}break;
+  case 'bulktagon':state.bulkDraft.tagOn=!state.bulkDraft.tagOn;render();break;
+  case 'bulkapply':{var bd=state.bulkDraft;state.items.forEach(function(i){if(!state.bulkSel[i.id])return;if(bd.type!=='__keep__'){i.type=bd.type;if(i.type==='recurring'&&!i.freqUnit)i.freqUnit='weekly';}if(bd.store!=='__keep__')i.store=bd.store;if(bd.eco!=='__keep__')i.eco=(bd.eco===''?'':Number(bd.eco));if(bd.tagOn)i.tag=(bd.tag||'').trim();});state.overlay=null;state.bulkMode=false;state.bulkSel={};state.bulkDraft={type:'__keep__',store:'__keep__',eco:'__keep__',tagOn:false,tag:''};save();render();break;}
   case 'edit':state.editingId=(state.editingId===id?null:id);render();break;
   case 'done':state.editingId=null;render();break;
   case 'del':if(it){state.items=state.items.filter(function(i){return i.id!==id;});state.editingId=null;save();render();}break;
@@ -592,6 +661,7 @@ app.addEventListener('input',function(e){
   case 'ename':if(it){it.name=t.value;save();}break;
   case 'etag':if(it){it.tag=t.value;save();}break;
   case 'dtag':state.draft.tag=t.value;save();break;
+  case 'bulktag':state.bulkDraft.tag=t.value;break;
   case 'scat':{var i=Number(t.getAttribute('data-i'));if(state.stores[i]){state.stores[i].category=t.value;save();}break;}
   case 'snote':{var j=Number(t.getAttribute('data-i'));if(state.stores[j]){state.stores[j].note=t.value;save();}break;}
   case 'nname':{var i1=needById(id);if(i1){i1.name=t.value;save();}break;}
@@ -614,6 +684,9 @@ app.addEventListener('change',function(e){
   case 'eeco':if(it){it.eco=t.value===''?'':Number(t.value);save();render();}break;
   case 'efreq':if(it){it.freqUnit=t.value;save();render();}break;
   case 'efdays':if(it){it.freqDays=Number(t.value)||1;save();}break;
+  case 'bulktype':state.bulkDraft.type=t.value;break;
+  case 'bulkstore':state.bulkDraft.store=t.value;break;
+  case 'bulkeco':state.bulkDraft.eco=t.value;break;
   case 'dstore':state.draft.store=t.value;save();break;
   case 'deco':state.draft.eco=t.value===''?'':Number(t.value);save();break;
   case 'dfreq':state.draft.freqUnit=t.value;save();render();break;
