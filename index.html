@@ -720,7 +720,7 @@ function catMeta(k){for(var i=0;i<CATS.length;i++)if(CATS[i].key===k)return CATS
 function scoreOptions(sel){var o='';for(var i=0;i<=10;i++)o+='<option value="'+i+'"'+(Number(sel)===i?' selected':'')+'>'+i+'</option>';return o;}
 function menuNav(){
  function item(view,icon,label){var cur=state.view===view;return '<button class="navi" data-act="nav" data-v="'+view+'">'+ico(icon)+label+'<span class="soon'+(cur?' cur':'')+'">'+(cur?'Current':'Open')+'</span></button>';}
- return item('consumables','basket','Consumables')+item('needs','home','Needs')+item('stores','store','Stores')+item('definitions','book','Definitions')+item('news','leaf','Sustainability news')+(cloud.user?('<button class="navi" data-act="signout">'+ico('user')+'Sign out<span class="soon">'+esc(cloud.user.email||'account')+'</span></button>'):'');
+ return item('consumables','basket','Consumables')+item('news','leaf','Sustainability News')+item('needs','home','Needs')+item('stores','store','Stores')+item('definitions','book','Definitions')+(cloud.user?('<button class="navi" data-act="signout">'+ico('user')+'Sign out<span class="soon">'+esc(cloud.user.email||'account')+'</span></button>'):'');
 }
 function renderNeeds(){
  var tabs='<button class="tab'+(state.needsTab==='dashboard'?' on':'')+'" data-act="ntab" data-v="dashboard">'+ico('layoutDashboard')+'Dashboard</button>'+
