@@ -263,7 +263,8 @@ var state={
  overlay:null, view:'consumables',
  bulkMode:false, bulkSel:{}, bulkDraft:{type:'__keep__',store:'__keep__',eco:'__keep__',tagOn:false,tag:''},
  needsTab:'dashboard', needsFilter:'all', needs:[], nEditingId:null, nExpandedId:null,
- newsFilterCat:'all', newsFilterAvail:'all', newsSort:'new', news:[], newsExpandedId:null, newsEditingId:null
+ newsFilterCat:'all', newsFilterAvail:'all', newsSort:'new', news:[], newsExpandedId:null, newsEditingId:null,
+ newsOrder:null
 };
 
 function migrateStores(arr){
@@ -515,6 +516,7 @@ function renderStores(){
 
 function render(){
  refreshRecurring();
+ if(state.view!=='news')state.newsOrder=null;
  var app=document.getElementById('app');
  if(cloud.enabled&&!cloud.user&&!cloud.localOnly){app.innerHTML=renderLogin();return;}
  if(state.view==='stores'){app.innerHTML=renderStores()+overlayHTML();return;}
@@ -618,7 +620,7 @@ app.addEventListener('click',function(e){
   case 'nsrcadd':{var na=needById(id);if(na){na.sources.push(['','']);save();render();}break;}
   case 'nsrcdel':{var nd=needById(id);if(nd){nd.sources.splice(Number(t.getAttribute('data-si')),1);save();render();}break;}
   case 'newssortopen':state.overlay='newssort';render();break;
-  case 'setnewssort':state.newsSort=t.getAttribute('data-v');state.overlay=null;save();render();break;
+  case 'setnewssort':state.newsSort=t.getAttribute('data-v');state.newsOrder=null;state.overlay=null;save();render();break;
   case 'newsfiltcat':state.newsFilterCat=t.getAttribute('data-v');render();break;
   case 'newsfiltavail':state.newsFilterAvail=t.getAttribute('data-v');render();break;
   case 'newsexpand':{var ax=newsById(id);if(ax){if(state.newsExpandedId===id){state.newsExpandedId=null;}else{state.newsExpandedId=id;ax.viewed=true;}state.newsEditingId=null;save();render();}break;}
@@ -914,7 +916,27 @@ function newsById(id){return state.news.find(function(x){return x.id===id;});}
 function newsCatMeta(k){for(var i=0;i<NEWSCATS.length;i++)if(NEWSCATS[i].key===k)return NEWSCATS[i];return NEWSCATS[1];}
 function newness(a){if(a.viewed)return 'viewed';return (Date.now()-a.publishedAt)<=7*86400000?'new':'unviewed';}
 function newnessRank(a){var n=newness(a);return n==='new'?0:n==='unviewed'?1:2;}
-function newsSorted(arr){var s=state.newsSort,a=arr.slice();if(s==='old')a.sort(function(x,y){return x.publishedAt-y.publishedAt;});else if(s==='unread')a.sort(function(x,y){return (newnessRank(x)-newnessRank(y))||(y.publishedAt-x.publishedAt);});else a.sort(function(x,y){return y.publishedAt-x.publishedAt;});return a;}
+function unreadCmp(x,y){return (newnessRank(x)-newnessRank(y))||(y.publishedAt-x.publishedAt);}
+function freezeNewsOrder(){state.newsOrder=state.news.slice().sort(unreadCmp).map(function(x){return x.id;});}
+function newsSorted(arr){
+ var s=state.newsSort,a=arr.slice();
+ if(s==='old'){a.sort(function(x,y){return x.publishedAt-y.publishedAt;});}
+ else if(s==='unread'){
+  var order=state.newsOrder;
+  if(order){
+   var pos={};order.forEach(function(id,i){pos[id]=i;});
+   a.sort(function(x,y){
+    var px=(x.id in pos)?pos[x.id]:-1,py=(y.id in pos)?pos[y.id]:-1;
+    if(px===-1&&py===-1)return unreadCmp(x,y);
+    if(px===-1)return -1;
+    if(py===-1)return 1;
+    return px-py;
+   });
+  } else {a.sort(unreadCmp);}
+ }
+ else {a.sort(function(x,y){return y.publishedAt-x.publishedAt;});}
+ return a;
+}
 function timeAgo(ts){var d=Math.floor((Date.now()-ts)/86400000);if(d<1)return 'today';if(d<7)return d+'d';if(d<30)return Math.floor(d/7)+'w';if(d<365)return Math.floor(d/30)+'mo';return Math.floor(d/365)+'y';}
 function sortLabel(){return state.newsSort==='old'?'Oldest':state.newsSort==='unread'?'Unread first':'Newest';}
 function newsChip(act,v,label,on){return '<button class="schip'+(on?' on':'')+'" data-act="'+act+'" data-v="'+v+'">'+label+'</button>';}
@@ -961,6 +983,7 @@ function newsCard(a){if(a.id===state.newsEditingId)return newsEdit(a);if(a.id===
 function renderNews(){
  var head='<div class="hd"><div class="brand"><span class="logo">'+ico('plant')+'</span><div><small>The Sustainable Home</small><b>News</b></div></div><button class="iconbtn" data-act="openmenu" aria-label="Menu">'+ico('menu')+'</button></div>';
  var barrow='<div style="display:flex;align-items:center;margin:0 2px 12px;gap:8px;"><span style="font-size:11px;color:var(--ink3);display:flex;align-items:center;gap:5px;"><span style="color:#639922;display:inline-flex;">'+ico('refresh')+'</span>Auto-updates daily</span><button class="addlink" data-act="newssortopen" style="margin-left:auto;">'+ico('sort')+' '+sortLabel()+'</button><button class="addlink" data-act="newsaddnew">'+ico('plus')+'Add</button></div>';
+ if(state.newsSort==='unread'){if(!state.newsOrder)freezeNewsOrder();}else{state.newsOrder=null;}
  var arr=state.news.filter(function(a){return (state.newsFilterCat==='all'||a.category===state.newsFilterCat)&&(state.newsFilterAvail==='all'||a.availability===state.newsFilterAvail);});
  arr=newsSorted(arr);
  var feed=arr.length?arr.map(newsCard).join(''):'<p class="hint" style="padding:6px 2px">No articles match. Try clearing filters.</p>';
