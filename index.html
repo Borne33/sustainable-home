@@ -16,7 +16,7 @@
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
 body{background:var(--bg);color:var(--ink);font-family:var(--font);-webkit-font-smoothing:antialiased;font-size:15px;line-height:1.4}
-.wrap{max-width:460px;margin:0 auto;padding:14px 12px 60px}
+.wrap{max-width:460px;margin:0 auto;padding:14px 12px 104px}
 .ic{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-0.15em}
 .ic text{stroke:none;fill:currentColor}
 button{font-family:inherit;cursor:pointer}
@@ -63,6 +63,11 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--green2);outline-
 .bulkcount{margin-left:auto;font-size:12px;color:var(--ink3)}
 .bulkedit{display:flex;align-items:center;gap:5px;padding:7px 12px;font-size:13px}
 .bulkedit[disabled]{opacity:.45;pointer-events:none}
+.bulkdelbtn{display:flex;align-items:center;gap:5px;padding:7px 12px;font-size:13px;font-weight:500;color:#fff;background:#E24B4A;border:none;border-radius:8px;cursor:pointer}
+.bulkdelbtn[disabled]{opacity:.45;pointer-events:none}
+.item.swipe{touch-action:pan-y;position:relative;will-change:transform}
+.item.swiping{transition:none}
+.item.swipereset{transition:transform .18s ease}
 .bulkform .f{margin-bottom:12px}
 .bulknote{font-size:12px;color:var(--ink2);background:var(--greenbg);border-radius:8px;padding:9px 11px;margin:0 0 14px}
 .bulkkeep{background:var(--card);border:.5px solid var(--border);border-radius:8px;padding:10px 11px;font-size:13px;color:var(--ink2);width:100%;text-align:left;cursor:pointer}
@@ -180,6 +185,21 @@ button.navi{background:none;border-left:none;border-right:none;border-bottom:non
 .addbtn{font-size:12px;font-weight:500;color:#fff;background:#639922;border:none;border-radius:16px;padding:7px 14px;display:inline-flex;align-items:center;gap:5px;cursor:pointer}
 .addbtn.done{background:#EAF3DE;color:#27500A}
 .srclink{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:#185FA5;text-decoration:none;margin-top:8px}
+.botbar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--bg);border-top:.5px solid var(--border);box-shadow:0 -2px 12px rgba(23,52,4,.06);padding:8px 12px calc(10px + env(safe-area-inset-bottom,0px))}
+.botinner{max-width:460px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
+.botrow{display:flex;align-items:center;gap:8px}
+.botrow .addbar{margin:0;flex:1;min-width:0}
+.botrow .tabs,.botrow .pills{margin:0;flex:1;min-width:0}
+.botrow .backbtn{flex:none}
+.botdraft{max-height:52vh;overflow-y:auto}
+.botdraft .draft{margin:0}
+.newscard.hl{background:#F5EDC4;border-color:#E4D48A}
+.newscard.hl.exp{border-color:#D9C766}
+.nact{font-size:12px;color:var(--ink2);display:flex;align-items:center;gap:5px;background:var(--muted);border:.5px solid var(--border);border-radius:16px;padding:6px 11px;cursor:pointer}
+.nact.on{background:#F5EDC4;border-color:#E4D48A;color:#6b5a12;font-weight:500}
+.srcrow{display:flex;align-items:center;gap:8px;padding:9px 2px;border-top:.5px solid var(--border);font-size:13px;color:var(--ink)}
+.srcrow .u{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.srcrow button{background:none;border:none;color:var(--ink3);padding:2px;display:flex;cursor:pointer}
 </style>
 </head>
 <body>
@@ -210,7 +230,7 @@ var P={
  leaf:'<path d="M5 21c.5 -6 4 -11 14 -11c0 8 -5 12 -11 12"/><path d="M5 21c3 -4 6 -7 9 -9"/>',
  archive:'<rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10"/><line x1="10" y1="12" x2="14" y2="12"/>',
  repeat:'<path d="M4 12v-2a3 3 0 0 1 3 -3h12"/><path d="M17 4l3 3l-3 3"/><path d="M20 12v2a3 3 0 0 1 -3 3h-12"/><path d="M7 20l-3 -3l3 -3"/>',
- infinity:'<path d="M6.5 8a4 4 0 1 0 0 8c2 0 3.2 -1.6 5.5 -4s3.5 -4 5.5 -4a4 4 0 1 1 0 8c-2 0 -3.2 -1.6 -5.5 -4"/>',
+ infinity:'<path d="M9.828 9.172a4 4 0 1 0 0 5.656a10 10 0 0 0 2.172 -2.828a10 10 0 0 1 2.172 -2.828a4 4 0 1 1 0 5.656a10 10 0 0 1 -2.172 -2.828a10 10 0 0 0 -2.172 -2.828z"/>',
  basket:'<path d="M5 10h14l-1.4 8.2a2 2 0 0 1 -2 1.8h-7.2a2 2 0 0 1 -2 -1.8z"/><path d="M9 10l2 -5M15 10l-2 -5"/><line x1="9.5" y1="13.5" x2="9.5" y2="16.5"/><line x1="14.5" y1="13.5" x2="14.5" y2="16.5"/>',
  store:'<path d="M4 9l1 -4h14l1 4"/><path d="M4 9a2 2 0 0 0 4 0a2 2 0 0 0 4 0a2 2 0 0 0 4 0a2 2 0 0 0 4 0"/><path d="M5 11v8a1 1 0 0 0 1 1h12a1 1 0 0 0 1 -1v-8"/>',
  plant:'<path d="M12 20v-8"/><path d="M12 12c0 -3 -2 -5 -5 -5c0 3 2 5 5 5"/><path d="M12 11c0 -3 2 -5 5 -5c0 3 -2 5 -5 5"/>'
@@ -234,6 +254,8 @@ Object.assign(P,{
 });
 Object.assign(P,{user:'<circle cx="12" cy="8" r="4"/><path d="M4 20a8 8 0 0 1 16 0"/>'});
 Object.assign(P,{listCheck:'<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 12l2 2l4 -4"/>'});
+Object.assign(P,{star:'<path d="M12 3l2.5 5.5l6 .8l-4.4 4.2l1.1 6l-5.2 -2.9l-5.2 2.9l1.1 -6l-4.4 -4.2l6 -.8z"/>'});
+Object.assign(P,{markunread:'<path d="M3 8l9 6l9 -6"/><rect x="3" y="5" width="18" height="14" rx="2"/>'});
 function ico(n){
  if(n==='onetime'){return '<svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><text x="12" y="16" text-anchor="middle" font-size="12" font-family="var(--font)">1</text></svg>';}
  return '<svg class="ic" viewBox="0 0 24 24">'+(P[n]||'')+'</svg>';
@@ -251,7 +273,7 @@ var STATUSMETA={idea:{label:'Idea',bg:'#EAE8DF',tx:'#5F5E5A',dot:'#D3D1C7'},plan
 var MED_INCOME=83730, MED_YEAR=2024;
 var AVAIL={available:{label:'Available',bg:'#EAF3DE',tx:'#27500A'},soon:{label:'Coming soon',bg:'#FAEEDA',tx:'#633806'},future:{label:'Future',bg:'#E6F1FB',tx:'#185FA5'}};
 var NEWSCATS=[{key:'consumables',label:'Consumables',icon:'basket'},{key:'house',label:'House',icon:'home'},{key:'energy',label:'Energy',icon:'bolt'},{key:'water',label:'Water',icon:'droplet'},{key:'air',label:'Air',icon:'wind'},{key:'waste',label:'Waste',icon:'recycle'},{key:'transport',label:'Transport',icon:'car'}];
-var NEWNESS={new:{label:'New',color:'#639922'},unviewed:{label:'Unviewed',color:'#EF9F27'},viewed:{label:'Viewed',color:'#B4B2A9'}};
+var NEWNESS={new:{label:'New',color:'#639922'},unviewed:{label:'Unread',color:'#EF9F27'},viewed:{label:'Read',color:'#B4B2A9'}};
 var KEY='sh_consumables_v1';
 
 var state={
@@ -263,8 +285,8 @@ var state={
  overlay:null, view:'consumables',
  bulkMode:false, bulkSel:{}, bulkDraft:{type:'__keep__',store:'__keep__',eco:'__keep__',tagOn:false,tag:''},
  needsTab:'dashboard', needsFilter:'all', needs:[], nEditingId:null, nExpandedId:null,
- newsFilterCat:'all', newsFilterAvail:'all', newsSort:'new', news:[], newsExpandedId:null, newsEditingId:null,
- newsOrder:null
+ newsFilterCat:'all', newsFilterAvail:'all', newsFilterHL:false, newsSort:'new', news:[], newsExpandedId:null, newsEditingId:null,
+ newsOrder:null, newsSources:[], sourceInput:''
 };
 
 function migrateStores(arr){
@@ -280,11 +302,12 @@ function load(){
    if(d.draft)state.draft=Object.assign(state.draft,d.draft);
    state.needs=Array.isArray(d.needs)?d.needs:seedNeeds();
    state.news=mergeNews(Array.isArray(d.news)?d.news:[],seedNews());
+   state.newsSources=Array.isArray(d.newsSources)?d.newsSources:[];
   } else { state.needs=seedNeeds(); state.news=seedNews(); }
  }catch(e){ if(!state.needs.length)state.needs=seedNeeds(); if(!state.news.length)state.news=seedNews(); }
 }
 function save(){
- try{localStorage.setItem(KEY,JSON.stringify({items:state.items,stores:state.stores,sort:state.sort,draft:state.draft,needs:state.needs,news:state.news}));}catch(e){}
+ try{localStorage.setItem(KEY,JSON.stringify({items:state.items,stores:state.stores,sort:state.sort,draft:state.draft,needs:state.needs,news:state.news,newsSources:state.newsSources}));}catch(e){}
  if(cloud.enabled&&cloud.user)cloudSync();
 }
 function storeNames(){return state.stores.map(function(s){return s.name;}).filter(Boolean);}
@@ -391,6 +414,7 @@ function bulkBar(g){
   '<button class="bulkall" data-act="bulkselall">'+(allSel?'Deselect all':'Select all')+'</button>'+
   '<span class="bulkcount">'+n+' selected</span>'+
   '<button class="done bulkedit" data-act="bulkopen"'+(n?'':' disabled')+'>'+ico('edit')+'Edit</button>'+
+  '<button class="bulkdelbtn" data-act="bulkdelask" aria-label="Delete selected"'+(n?'':' disabled')+'>'+ico('trash')+'Delete</button>'+
  '</div>';
 }
 function rowDisplay(it){
@@ -408,7 +432,7 @@ function rowDisplay(it){
    '<span class="ty'+(m.green?' green':'')+'" title="'+m.label+'">'+ico(m.ic)+'</span>'+badge+
   '</div>';
  }
- return '<div class="item'+(it.checked?' done':'')+'">'+
+ return '<div class="item swipe'+(it.checked?' done':'')+'" data-swipe-id="'+it.id+'">'+
   '<button class="cb'+(it.checked?' on':'')+'" data-act="toggle" data-id="'+it.id+'" aria-label="Mark purchased">'+(it.checked?ico('check'):'')+'</button>'+
   '<div class="body" data-act="edit" data-id="'+it.id+'"><div class="nm">'+esc(it.name)+'</div>'+(meta.length?'<div class="mt">'+meta.join(' · ')+'</div>':'')+'</div>'+
   '<span class="ty'+(m.green?' green':'')+'" title="'+m.label+'">'+ico(m.ic)+'</span>'+badge+
@@ -486,6 +510,19 @@ function overlayHTML(){
   '</div>';
   return ovlWrap('Bulk edit',bbody);
  }
+ if(state.overlay==='newssources'){
+  var srows=state.newsSources.length?state.newsSources.map(function(s){return '<div class="srcrow"><span class="u">'+esc(s.url)+'</span><button data-act="delsource" data-id="'+s.id+'" aria-label="Remove source">'+ico('trash')+'</button></div>';}).join(''):'<p class="hint" style="padding:10px 2px">No sources yet. Paste a website link above to add one.</p>';
+  var sbody='<p class="bulknote">Add the websites you’d like to pull news from — just paste the link.</p>'+
+   '<div class="addbar" style="margin-bottom:8px;"><span class="addplus" style="display:flex;">'+ico('plus')+'</span><input id="sourceinput" data-act="sourceinput" placeholder="example.com/blog" value="'+escA(state.sourceInput)+'" inputmode="url" style="flex:1;border:none;background:transparent;height:30px;"/><button class="done" data-act="addsource" style="padding:7px 14px;">Add</button></div>'+
+   srows;
+  return ovlWrap('News sources',sbody);
+ }
+ if(state.overlay==='bulkdel'){
+  var dn=bulkSelCount();
+  var dbody='<p class="bulknote" style="background:#FBE9E9;color:#8a1c1c;">Delete '+dn+' selected item'+(dn===1?'':'s')+'? This can’t be undone.</p>'+
+   '<div class="bulkactions"><button class="clearbtn" data-act="closeovl">Cancel</button><button class="bulkdelbtn" data-act="bulkdelete" style="justify-content:center;">'+ico('trash')+'Delete '+dn+'</button></div>';
+  return ovlWrap('Delete items',dbody);
+ }
  return '';
 }
 function ovlWrap(title,body){
@@ -508,21 +545,44 @@ function renderStores(){
   '</div>';
  }).join('');
  var empty=state.stores.length?'':'<div class="empty"><div class="big">'+ico('store')+'</div><p style="font-weight:500;color:var(--ink)">No stores yet</p><p>Add the shops you buy from, rate how sustainable they are, and keep notes.</p></div>';
- return '<div class="pagehd"><button class="backbtn" data-act="backhome" aria-label="Back to Consumables">'+ico('chevronLeft')+'</button>'+
+ return '<div class="pagehd">'+
    '<div class="brand"><span class="logo">'+ico('store')+'</span><div><small>The Sustainable Home</small><b>Stores</b></div></div></div>'+
    '<button class="addstorebtn" data-act="saddstore">'+ico('plus')+' Add store</button>'+
    (state.stores.length?list:empty);
 }
 
+function bottomBar(){
+ var ham='<button class="iconbtn" data-act="openmenu" aria-label="Menu">'+ico('menu')+'</button>';
+ var inner='';
+ if(state.view==='consumables'){
+  inner=(state.detailsOpen?'<div class="botdraft">'+draftForm()+'</div>':'')+
+   '<div class="botrow"><div class="addbar">'+
+    '<button class="addplus" data-act="add" aria-label="Add">'+ico('plus')+'</button>'+
+    '<input id="newname" data-act="newname" placeholder="Add an item…" value="'+escA(state.newName)+'"/>'+
+    '<button class="dtoggle" data-act="toggledetails">Details '+ico(state.detailsOpen?'chevronDown':'chevronUp')+'</button>'+
+   '</div>'+ham+'</div>';
+ } else if(state.view==='news'){
+  var avchips=newsChip('newsfiltavail','all','All',state.newsFilterAvail==='all')+Object.keys(AVAIL).map(function(k){return newsChip('newsfiltavail',k,AVAIL[k].label,state.newsFilterAvail===k);}).join('');
+  inner='<div class="botrow"><div class="pills">'+avchips+'</div>'+ham+'</div>';
+ } else if(state.view==='needs'){
+  var tabs='<button class="tab'+(state.needsTab==='dashboard'?' on':'')+'" data-act="ntab" data-v="dashboard">'+ico('layoutDashboard')+'Dashboard</button>'+CATS.map(function(c){return '<button class="tab'+(state.needsTab===c.key?' on':'')+'" data-act="ntab" data-v="'+c.key+'">'+ico(c.icon)+c.label+'</button>';}).join('');
+  inner='<div class="botrow"><div class="tabs">'+tabs+'</div>'+ham+'</div>';
+ } else if(state.view==='stores'){
+  inner='<div class="botrow"><button class="backbtn" data-act="backhome" aria-label="Back to Consumables">'+ico('chevronLeft')+'</button><div style="flex:1;"></div>'+ham+'</div>';
+ } else if(state.view==='definitions'){
+  inner='<div class="botrow"><button class="backbtn" data-act="nav" data-v="consumables" aria-label="Back to Consumables">'+ico('chevronLeft')+'</button><div style="flex:1;"></div>'+ham+'</div>';
+ } else { return ''; }
+ return '<div class="botbar"><div class="botinner">'+inner+'</div></div>';
+}
 function render(){
  refreshRecurring();
  if(state.view!=='news')state.newsOrder=null;
  var app=document.getElementById('app');
  if(cloud.enabled&&!cloud.user&&!cloud.localOnly){app.innerHTML=renderLogin();return;}
- if(state.view==='stores'){app.innerHTML=renderStores()+overlayHTML();return;}
- if(state.view==='needs'){app.innerHTML=renderNeeds()+overlayHTML();return;}
- if(state.view==='definitions'){app.innerHTML=renderDefinitions()+overlayHTML();return;}
- if(state.view==='news'){app.innerHTML=renderNews()+overlayHTML();return;}
+ if(state.view==='stores'){app.innerHTML=renderStores()+overlayHTML()+bottomBar();return;}
+ if(state.view==='needs'){app.innerHTML=renderNeeds()+overlayHTML()+bottomBar();return;}
+ if(state.view==='definitions'){app.innerHTML=renderDefinitions()+overlayHTML()+bottomBar();return;}
+ if(state.view==='news'){app.innerHTML=renderNews()+overlayHTML()+bottomBar();return;}
 
  var g=groups();
  var pills='<button class="pill'+(state.filter.store?'':' on')+'" data-act="pillstore" data-v="">All</button>'+
@@ -532,14 +592,7 @@ function render(){
  var html=''+
  '<div class="hd">'+
   '<div class="brand"><span class="logo">'+ico('plant')+'</span><div><small>The Sustainable Home</small><b>Consumables</b></div></div>'+
-  '<button class="iconbtn" data-act="openmenu" aria-label="Menu">'+ico('menu')+'</button>'+
  '</div>'+
- '<div class="addbar">'+
-  '<button class="addplus" data-act="add" aria-label="Add">'+ico('plus')+'</button>'+
-  '<input id="newname" data-act="newname" placeholder="Add an item…" value="'+escA(state.newName)+'"/>'+
-  '<button class="dtoggle" data-act="toggledetails">Details '+ico(state.detailsOpen?'chevronUp':'chevronDown')+'</button>'+
- '</div>'+
- (state.detailsOpen?draftForm():'')+
  '<div class="frow">'+
   '<div class="pills">'+pills+'</div>'+
   '<div class="tools">'+
@@ -570,6 +623,7 @@ function render(){
   }
  }
  html+=overlayHTML();
+ html+=bottomBar();
  app.innerHTML=html;
 }
 
@@ -623,6 +677,12 @@ app.addEventListener('click',function(e){
   case 'setnewssort':state.newsSort=t.getAttribute('data-v');state.newsOrder=null;state.overlay=null;save();render();break;
   case 'newsfiltcat':state.newsFilterCat=t.getAttribute('data-v');render();break;
   case 'newsfiltavail':state.newsFilterAvail=t.getAttribute('data-v');render();break;
+  case 'newsfilthl':state.newsFilterHL=!state.newsFilterHL;render();break;
+  case 'newsunread':{var au=newsById(id);if(au){au.viewed=false;save();render();}break;}
+  case 'newshl':{var ah=newsById(id);if(ah){ah.highlight=!ah.highlight;save();render();}break;}
+  case 'newssources':state.overlay='newssources';render();break;
+  case 'addsource':{var raw=(state.sourceInput||'').trim();if(raw){var url=/^https?:\/\//i.test(raw)?raw:'https://'+raw;var exists=state.newsSources.some(function(s){return s.url.toLowerCase()===url.toLowerCase();});if(!exists){state.newsSources.push({id:uid(),url:url,createdAt:Date.now()});}state.sourceInput='';save();render();}break;}
+  case 'delsource':state.newsSources=state.newsSources.filter(function(s){return s.id!==id;});save();render();break;
   case 'newsexpand':{var ax=newsById(id);if(ax){if(state.newsExpandedId===id){state.newsExpandedId=null;}else{state.newsExpandedId=id;ax.viewed=true;}state.newsEditingId=null;save();render();}break;}
   case 'newscollapse':state.newsExpandedId=null;render();break;
   case 'newsedit':state.newsEditingId=id;state.newsExpandedId=id;render();break;
@@ -640,6 +700,8 @@ app.addEventListener('click',function(e){
   case 'bulktoggle':if(id){if(state.bulkSel[id])delete state.bulkSel[id];else state.bulkSel[id]=true;render();}break;
   case 'bulkselall':{var gg=groups();var vids=visibleIds(gg);var allS=vids.length>0&&vids.every(function(x){return state.bulkSel[x];});vids.forEach(function(x){if(allS)delete state.bulkSel[x];else state.bulkSel[x]=true;});render();break;}
   case 'bulkopen':if(bulkSelCount()>0){state.overlay='bulkedit';render();}break;
+  case 'bulkdelask':if(bulkSelCount()>0){state.overlay='bulkdel';render();}break;
+  case 'bulkdelete':{state.items=state.items.filter(function(i){return !state.bulkSel[i.id];});state.overlay=null;state.bulkMode=false;state.bulkSel={};save();render();break;}
   case 'bulktagon':state.bulkDraft.tagOn=!state.bulkDraft.tagOn;render();break;
   case 'bulkapply':{var bd=state.bulkDraft;state.items.forEach(function(i){if(!state.bulkSel[i.id])return;if(bd.type!=='__keep__'){i.type=bd.type;if(i.type==='recurring'&&!i.freqUnit)i.freqUnit='weekly';}if(bd.store!=='__keep__')i.store=bd.store;if(bd.eco!=='__keep__')i.eco=(bd.eco===''?'':Number(bd.eco));if(bd.tagOn)i.tag=(bd.tag||'').trim();});state.overlay=null;state.bulkMode=false;state.bulkSel={};state.bulkDraft={type:'__keep__',store:'__keep__',eco:'__keep__',tagOn:false,tag:''};save();render();break;}
   case 'edit':state.editingId=(state.editingId===id?null:id);render();break;
@@ -657,6 +719,7 @@ app.addEventListener('input',function(e){
  var act=t.getAttribute('data-act');var id=t.getAttribute('data-id');var it=id?itemById(id):null;
  switch(act){
   case 'newname':state.newName=t.value;break;
+  case 'sourceinput':state.sourceInput=t.value;break;
   case 'authemail':cloud.authEmail=t.value;break;
   case 'authpass':cloud.authPass=t.value;break;
   case 'search':state.search=t.value;renderListOnly();break;
@@ -714,7 +777,40 @@ function renderListOnly(){
 
 app.addEventListener('keydown',function(e){
  if(e.key==='Enter'&&e.target&&e.target.id==='newname'){e.preventDefault();addItem();}
+ if(e.key==='Enter'&&e.target&&e.target.id==='sourceinput'){e.preventDefault();var raw=(state.sourceInput||'').trim();if(raw){var url=/^https?:\/\//i.test(raw)?raw:'https://'+raw;if(!state.newsSources.some(function(s){return s.url.toLowerCase()===url.toLowerCase();})){state.newsSources.push({id:uid(),url:url,createdAt:Date.now()});}state.sourceInput='';save();render();}}
 });
+
+// Swipe-left-to-delete on consumable rows (mobile)
+(function(){
+ var sEl=null,sId=null,x0=0,y0=0,active=false,locked=false,dx=0;
+ function itemEl(t){return (t&&t.closest)?t.closest('.item.swipe[data-swipe-id]'):null;}
+ app.addEventListener('touchstart',function(e){
+  if(state.bulkMode||!e.touches||e.touches.length!==1)return;
+  var el=itemEl(e.target);if(!el)return;
+  sEl=el;sId=el.getAttribute('data-swipe-id');x0=e.touches[0].clientX;y0=e.touches[0].clientY;active=true;locked=false;dx=0;
+  el.classList.add('swiping');el.classList.remove('swipereset');
+ },{passive:true});
+ app.addEventListener('touchmove',function(e){
+  if(!active||!sEl)return;
+  var ddx=e.touches[0].clientX-x0,ddy=e.touches[0].clientY-y0;
+  if(!locked){
+   if(Math.abs(ddx)>Math.abs(ddy)&&Math.abs(ddx)>8){locked=true;}
+   else if(Math.abs(ddy)>8){active=false;sEl.classList.remove('swiping');sEl.style.transform='';return;}
+   else{return;}
+  }
+  if(ddx>0)ddx=0; if(ddx<-140)ddx=-140; dx=ddx;
+  sEl.style.transform='translateX('+ddx+'px)';
+  if(e.cancelable)e.preventDefault();
+ },{passive:false});
+ function endSwipe(){
+  if(!active||!sEl){active=false;sEl=null;return;}
+  var el=sEl,id=sId,d=dx; el.classList.remove('swiping'); active=false;sEl=null;sId=null;
+  if(d<-70){state.items=state.items.filter(function(i){return i.id!==id;});save();render();}
+  else{el.classList.add('swipereset');el.style.transform='';}
+ }
+ app.addEventListener('touchend',endSwipe,{passive:true});
+ app.addEventListener('touchcancel',endSwipe,{passive:true});
+})();
 
 var NEEDS_SEED=[
 {c:'house',n:'Hempcrete walls',d:'Breathable lime-and-hemp cast walls that store carbon and resist mold.',co:2,r:15,q:[9,9,7,8,5,7],s:[['Hempcrete — Wikipedia','https://en.wikipedia.org/wiki/Hempcrete'],['BuildingGreen','https://www.buildinggreen.com']]},
@@ -798,12 +894,9 @@ function menuNav(){
  return item('consumables','basket','Consumables')+item('news','leaf','Sustainability News')+item('needs','home','Needs')+item('stores','store','Stores')+item('definitions','book','Definitions')+(cloud.user?('<button class="navi" data-act="signout">'+ico('user')+'Sign out<span class="soon">'+esc(cloud.user.email||'account')+'</span></button>'):'');
 }
 function renderNeeds(){
- var tabs='<button class="tab'+(state.needsTab==='dashboard'?' on':'')+'" data-act="ntab" data-v="dashboard">'+ico('layoutDashboard')+'Dashboard</button>'+
-  CATS.map(function(c){return '<button class="tab'+(state.needsTab===c.key?' on':'')+'" data-act="ntab" data-v="'+c.key+'">'+ico(c.icon)+c.label+'</button>';}).join('');
- var head='<div class="hd"><div class="brand"><span class="logo">'+ico('plant')+'</span><div><small>The Sustainable Home</small><b>Needs</b></div></div>'+
-  '<button class="iconbtn" data-act="openmenu" aria-label="Menu">'+ico('menu')+'</button></div>';
+ var head='<div class="hd"><div class="brand"><span class="logo">'+ico('plant')+'</span><div><small>The Sustainable Home</small><b>Needs</b></div></div></div>';
  var body=state.needsTab==='dashboard'?needsDashboard():needsCategory(state.needsTab);
- return head+'<div class="tabs">'+tabs+'</div>'+body;
+ return head+body;
 }
 function needsDashboard(){
  var total=state.needs.length;
@@ -877,7 +970,7 @@ function defRow(t,range,desc){return '<div class="defrow"><span class="deftier">
 function renderDefinitions(){
  var low=Math.round(MED_INCOME/40),high=Math.round(MED_INCOME/8);
  function money(n){return '$'+n.toLocaleString('en-US');}
- var head='<div class="pagehd"><button class="backbtn" data-act="nav" data-v="consumables" aria-label="Back">'+ico('chevronLeft')+'</button><div class="brand"><span class="logo">'+ico('book')+'</span><div><small>The Sustainable Home</small><b>Definitions</b></div></div></div>';
+ var head='<div class="pagehd"><div class="brand"><span class="logo">'+ico('book')+'</span><div><small>The Sustainable Home</small><b>Definitions</b></div></div></div>';
  var intro='<div class="slabel" style="margin:0 2px 6px;">Cost tiers</div><p style="margin:0 2px 6px;font-size:13px;color:var(--ink2);line-height:1.55;">Relative to the U.S. Census median household income ('+money(MED_INCOME)+' for '+MED_YEAR+'). They refresh once a year when new Census data is released (each September).</p>';
  var rows='<div class="deflist">'+defRow('$','Under '+money(low),'Less than 1/40 of median household income.')+defRow('$$',money(low)+' - '+money(high),'Between 1/40 and 1/8 of median household income.')+defRow('$$$','Over '+money(high),'More than 1/8 of median household income.')+'</div>';
  var roi='<div class="slabel" style="margin:18px 2px 6px;">ROI (years)</div><p style="margin:0 2px;font-size:13px;color:var(--ink2);line-height:1.55;">The typical number of years for energy, water, or durability savings to offset the added cost. It is an approximate planning estimate; actual payback varies by home, climate, utility rates, and incentives. Items without a direct monetary payback show "varies".</p>';
@@ -910,7 +1003,7 @@ var NEWS_SEED=[
 {c:"transport",t:"Field tests show your EV can back up your home",so:"arXiv",u:"https://arxiv.org/pdf/2308.13624",bd:"Residential bidirectional (vehicle-to-home) chargers tested in the field can power a house during outages and shave peak costs.",av:"soon",ago:65,vw:false},
 {c:"waste",t:"Smarter home food-waste recycling systems",so:"Applied research",u:"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10857120/",bd:"New user-centric designs pair sensors and apps with composting to cut the roughly 2,200 dollars of food an average household wastes yearly.",av:"soon",ago:35,vw:false}
 ];
-function seedNews(){return NEWS_SEED.map(function(o){return {id:uid(),title:o.t,source:o.so,url:o.u,body:o.bd,category:o.c,availability:o.av,publishedAt:Date.now()-o.ago*86400000,viewed:!!o.vw,added:false};});}
+function seedNews(){return NEWS_SEED.map(function(o){return {id:uid(),title:o.t,source:o.so,url:o.u,body:o.bd,category:o.c,availability:o.av,publishedAt:Date.now()-o.ago*86400000,viewed:!!o.vw,added:false,highlight:false};});}
 function mergeNews(stored,seed){var byUrl={};stored.forEach(function(a){if(a.url)byUrl[a.url]=true;});var merged=stored.slice();seed.forEach(function(s){if(!byUrl[s.url])merged.push(s);});return merged;}
 function newsById(id){return state.news.find(function(x){return x.id===id;});}
 function newsCatMeta(k){for(var i=0;i<NEWSCATS.length;i++)if(NEWSCATS[i].key===k)return NEWSCATS[i];return NEWSCATS[1];}
@@ -942,15 +1035,14 @@ function sortLabel(){return state.newsSort==='old'?'Oldest':state.newsSort==='un
 function newsChip(act,v,label,on){return '<button class="schip'+(on?' on':'')+'" data-act="'+act+'" data-v="'+v+'">'+label+'</button>';}
 function newsChipIcon(act,v,label,icon,on){return '<button class="schip'+(on?' on':'')+'" data-act="'+act+'" data-v="'+v+'" style="display:flex;align-items:center;gap:4px;">'+ico(icon)+label+'</button>';}
 function newsFilters(){
- var cat='<div style="font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink3);margin:0 2px 5px;">Category</div><div class="subrow">'+newsChip('newsfiltcat','all','All',state.newsFilterCat==='all')+NEWSCATS.map(function(cc){return newsChipIcon('newsfiltcat',cc.key,cc.label,cc.icon,state.newsFilterCat===cc.key);}).join('')+'</div>';
- var av='<div style="font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink3);margin:0 2px 5px;">Availability</div><div class="subrow" style="margin-bottom:12px;">'+newsChip('newsfiltavail','all','All',state.newsFilterAvail==='all')+Object.keys(AVAIL).map(function(k){return newsChip('newsfiltavail',k,AVAIL[k].label,state.newsFilterAvail===k);}).join('')+'</div>';
- return cat+av;
+ var cat='<div style="font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink3);margin:0 2px 5px;">Category</div><div class="subrow" style="margin-bottom:12px;">'+newsChip('newsfiltcat','all','All',state.newsFilterCat==='all')+NEWSCATS.map(function(cc){return newsChipIcon('newsfiltcat',cc.key,cc.label,cc.icon,state.newsFilterCat===cc.key);}).join('')+'</div>';
+ return cat;
 }
 function addBtnHTML(a){var isc=a.category==='consumables';var lab=isc?'Add to list':'Add to ideas';var ic=isc?'basket':'bulb';return a.added?'<span class="addbtn done">'+ico('check')+'Added</span>':'<button class="addbtn" data-act="newsact" data-id="'+a.id+'">'+ico(ic)+lab+'</button>';}
 function newsCollapsed(a){
  var nw=newness(a),nm=NEWNESS[nw],av=AVAIL[a.availability],cm=newsCatMeta(a.category);
  var right=nw==='new'?'<span class="newbadge">NEW</span>':'<span style="font-size:11px;color:'+nm.color+';display:flex;align-items:center;gap:4px;white-space:nowrap;">'+(nw==='viewed'?ico('eye'):'<span style="width:7px;height:7px;border-radius:50%;background:'+nm.color+';display:inline-block;"></span>')+nm.label+'</span>';
- return '<div class="newscard" data-act="newsexpand" data-id="'+a.id+'">'+
+ return '<div class="newscard'+(a.highlight?' hl':'')+'" data-act="newsexpand" data-id="'+a.id+'">'+
   '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;"><div class="nsrc">'+esc(a.source)+' · '+timeAgo(a.publishedAt)+'</div>'+right+'</div>'+
   '<div class="ntitle" style="margin-top:3px;">'+esc(a.title||'Untitled')+'</div>'+
   '<div class="nbody clamp">'+esc(a.body)+'</div>'+
@@ -960,13 +1052,18 @@ function newsCollapsed(a){
 }
 function newsExpanded(a){
  var nw=newness(a),nm=NEWNESS[nw],av=AVAIL[a.availability],cm=newsCatMeta(a.category);
- return '<div class="newscard exp">'+
-  '<div style="display:flex;justify-content:space-between;align-items:center;"><div class="nsrc">'+esc(a.source)+' · '+timeAgo(a.publishedAt)+'</div><span style="font-size:11px;color:'+nm.color+';">'+nm.label+'</span></div>'+
+ var utils='<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">'+
+  (a.viewed?'<button class="nact" data-act="newsunread" data-id="'+a.id+'">'+ico('markunread')+'Mark unread</button>':'')+
+  '<button class="nact'+(a.highlight?' on':'')+'" data-act="newshl" data-id="'+a.id+'">'+ico('star')+(a.highlight?'Highlighted':'Highlight')+'</button>'+
+  '</div>';
+ return '<div class="newscard exp'+(a.highlight?' hl':'')+'" data-act="newscollapse" data-id="'+a.id+'">'+
+  '<div style="display:flex;justify-content:space-between;align-items:center;"><div class="nsrc">'+esc(a.source)+' · '+timeAgo(a.publishedAt)+'</div><span style="font-size:11px;color:'+nm.color+';display:flex;align-items:center;gap:5px;">'+nm.label+ico('chevronUp')+'</span></div>'+
   '<div class="ntitle" style="font-size:16px;margin-top:4px;">'+esc(a.title||'Untitled')+'</div>'+
   '<div class="nbody" style="margin-top:8px;">'+esc(a.body)+'</div>'+
-  (a.url?'<a class="srclink" href="'+escA(a.url)+'" target="_blank" rel="noopener">'+ico('ext')+'Read at '+esc(a.source||'source')+'</a>':'')+
+  (a.url?'<a class="srclink" data-act="noop" href="'+escA(a.url)+'" target="_blank" rel="noopener">'+ico('ext')+'Read at '+esc(a.source||'source')+'</a>':'')+
   '<div style="display:flex;align-items:center;gap:6px;margin-top:12px;flex-wrap:wrap;"><span class="catpill"><span style="display:inline-flex;">'+ico(cm.icon)+'</span>'+cm.label+'</span><span class="spill" style="background:'+av.bg+';color:'+av.tx+';">'+av.label+'</span><span style="margin-left:auto;">'+addBtnHTML(a)+'</span></div>'+
-  '<div class="erow2" style="margin-top:12px;"><button class="del" data-act="newsdel" data-id="'+a.id+'">'+ico('trash')+' Remove</button><span><button class="addlink" data-act="newsedit" data-id="'+a.id+'" style="margin-right:14px;">'+ico('edit')+' Edit tags</button><button class="addlink" data-act="newscollapse" data-id="'+a.id+'">Collapse '+ico('chevronUp')+'</button></span></div></div>';
+  utils+
+  '<div class="erow2" style="margin-top:12px;"><button class="del" data-act="newsdel" data-id="'+a.id+'">'+ico('trash')+' Remove</button><button class="addlink" data-act="newsedit" data-id="'+a.id+'">'+ico('edit')+' Edit tags</button></div></div>';
 }
 function newsEdit(a){
  var catOpts=NEWSCATS.map(function(cc){return '<option value="'+cc.key+'"'+(a.category===cc.key?' selected':'')+'>'+cc.label+'</option>';}).join('');
@@ -981,10 +1078,10 @@ function newsEdit(a){
 }
 function newsCard(a){if(a.id===state.newsEditingId)return newsEdit(a);if(a.id===state.newsExpandedId)return newsExpanded(a);return newsCollapsed(a);}
 function renderNews(){
- var head='<div class="hd"><div class="brand"><span class="logo">'+ico('plant')+'</span><div><small>The Sustainable Home</small><b>News</b></div></div><button class="iconbtn" data-act="openmenu" aria-label="Menu">'+ico('menu')+'</button></div>';
- var barrow='<div style="display:flex;align-items:center;margin:0 2px 12px;gap:8px;"><span style="font-size:11px;color:var(--ink3);display:flex;align-items:center;gap:5px;"><span style="color:#639922;display:inline-flex;">'+ico('refresh')+'</span>Auto-updates daily</span><button class="addlink" data-act="newssortopen" style="margin-left:auto;">'+ico('sort')+' '+sortLabel()+'</button><button class="addlink" data-act="newsaddnew">'+ico('plus')+'Add</button></div>';
+ var head='<div class="hd"><div class="brand"><span class="logo">'+ico('plant')+'</span><div><small>The Sustainable Home</small><b>News</b></div></div></div>';
+ var barrow='<div style="display:flex;align-items:center;margin:0 2px 12px;gap:8px;"><button class="addlink" data-act="newsfilthl" style="'+(state.newsFilterHL?'color:#b58a12;font-weight:500;':'')+'">'+ico('star')+(state.newsFilterHL?'Highlighted':'Highlights')+'</button><button class="addlink" data-act="newssortopen" style="margin-left:auto;">'+ico('sort')+' '+sortLabel()+'</button><button class="addlink" data-act="newssources">'+ico('plus')+'Sources</button></div>';
  if(state.newsSort==='unread'){if(!state.newsOrder)freezeNewsOrder();}else{state.newsOrder=null;}
- var arr=state.news.filter(function(a){return (state.newsFilterCat==='all'||a.category===state.newsFilterCat)&&(state.newsFilterAvail==='all'||a.availability===state.newsFilterAvail);});
+ var arr=state.news.filter(function(a){return (state.newsFilterCat==='all'||a.category===state.newsFilterCat)&&(state.newsFilterAvail==='all'||a.availability===state.newsFilterAvail)&&(!state.newsFilterHL||a.highlight);});
  arr=newsSorted(arr);
  var feed=arr.length?arr.map(newsCard).join(''):'<p class="hint" style="padding:6px 2px">No articles match. Try clearing filters.</p>';
  return head+barrow+newsFilters()+feed;
@@ -996,8 +1093,8 @@ function mapStoreRow(s){return {id:s.id,user_id:cloud.user.id,name:s.name||'',ec
 function rowStore(r){return {id:r.id,name:r.name,eco:(r.eco==null?'':r.eco),category:r.category||'',note:r.note||''};}
 function mapNeedRow(n){return {id:n.id,user_id:cloud.user.id,category:n.category,name:n.name||'',description:n.desc||'',cost:n.cost||2,roi:(n.roi==null||n.roi==='')?null:Number(n.roi),status:n.status||'idea',q:n.q||[5,5,5,5,5,5],sources:n.sources||[]};}
 function rowNeed(r){return {id:r.id,category:r.category,name:r.name,desc:r.description,cost:r.cost,roi:r.roi,status:r.status,q:r.q||[5,5,5,5,5,5],sources:r.sources||[]};}
-function mapNewsRow(a){return {id:a.id,user_id:cloud.user.id,title:a.title||'',source:a.source||'',url:a.url||'',body:a.body||'',category:a.category||'house',availability:a.availability||'available',published_at:a.publishedAt?new Date(a.publishedAt).toISOString():new Date().toISOString(),viewed:!!a.viewed,added:!!a.added};}
-function rowNews(r){return {id:r.id,title:r.title,source:r.source,url:r.url,body:r.body,category:r.category,availability:r.availability,publishedAt:r.published_at?Date.parse(r.published_at):Date.now(),viewed:r.viewed,added:r.added};}
+function mapNewsRow(a){return {id:a.id,user_id:cloud.user.id,title:a.title||'',source:a.source||'',url:a.url||'',body:a.body||'',category:a.category||'house',availability:a.availability||'available',published_at:a.publishedAt?new Date(a.publishedAt).toISOString():new Date().toISOString(),viewed:!!a.viewed,added:!!a.added,highlighted:!!a.highlight};}
+function rowNews(r){return {id:r.id,title:r.title,source:r.source,url:r.url,body:r.body,category:r.category,availability:r.availability,publishedAt:r.published_at?Date.parse(r.published_at):Date.now(),viewed:r.viewed,added:r.added,highlight:!!r.highlighted};}
 function renderLogin(){
  return '<div style="max-width:360px;margin:44px auto 0;text-align:center;">'+
   '<div style="width:56px;height:56px;border-radius:50%;background:var(--leaf);display:flex;align-items:center;justify-content:center;color:var(--greentx);margin:0 auto 14px;font-size:26px;">'+ico('plant')+'</div>'+
