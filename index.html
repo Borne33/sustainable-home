@@ -16,7 +16,7 @@
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
 body{background:var(--bg);color:var(--ink);font-family:var(--font);-webkit-font-smoothing:antialiased;font-size:15px;line-height:1.4}
-.wrap{max-width:460px;margin:0 auto;padding:14px 12px 150px}
+.wrap{max-width:460px;margin:0 auto;padding:14px 12px 188px}
 .ic{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-0.15em}
 .ic text{stroke:none;fill:currentColor}
 button{font-family:inherit;cursor:pointer}
@@ -66,7 +66,8 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--green2);outline-
 .bulkdelbtn{display:flex;align-items:center;gap:5px;padding:7px 12px;font-size:13px;font-weight:500;color:#fff;background:#E24B4A;border:none;border-radius:8px;cursor:pointer}
 .bulkdelbtn[disabled]{opacity:.45;pointer-events:none}
 .swipewrap{position:relative;border-radius:var(--radius);overflow:hidden;touch-action:pan-y}
-.swipedel{position:absolute;inset:0;background:#E24B4A;color:#fff;display:flex;align-items:center;justify-content:flex-end;gap:7px;padding:0 20px;font-size:14px;font-weight:600;letter-spacing:.02em}
+.swipedel{position:absolute;inset:0;background:#E24B4A;color:#fff;display:flex;align-items:center;justify-content:flex-end;gap:7px;padding:0 20px;font-size:14px;font-weight:600;letter-spacing:.02em;opacity:0}
+.swipewrap.sw-active .swipedel{opacity:1}
 .swipewrap .item{position:relative;will-change:transform}
 .swipewrap .item.swiping{transition:none}
 .swipewrap .item.swipereset{transition:transform .18s ease}
@@ -175,6 +176,11 @@ button.navi{background:none;border-left:none;border-right:none;border-bottom:non
 .deflist{margin-top:4px}
 .defrow{display:flex;gap:14px;padding:14px 4px;border-top:.5px solid var(--border);align-items:flex-start}
 .deftier{font-size:18px;font-weight:500;color:var(--green);flex:none;width:48px}
+.qtot{font-size:13px;color:var(--ink2);margin:4px 2px 2px;display:flex;align-items:center;gap:6px}
+.qtot .eco{font-size:13px}
+.muted{color:var(--ink3);font-weight:400}
+.qlbl{margin:8px 2px 6px}
+.defta{width:100%;box-sizing:border-box;font-size:13px;background:var(--muted);border:.5px solid var(--border);border-radius:8px;padding:8px 10px;min-height:60px;line-height:1.5;color:var(--ink2);font-family:inherit;resize:vertical;margin-top:4px}
 
 .newscard{background:var(--card);border:.5px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px;cursor:pointer}
 .newscard.exp{border:1.5px solid var(--green2);cursor:default}
@@ -187,9 +193,9 @@ button.navi{background:none;border-left:none;border-right:none;border-bottom:non
 .addbtn{font-size:12px;font-weight:500;color:#fff;background:#639922;border:none;border-radius:16px;padding:7px 14px;display:inline-flex;align-items:center;gap:5px;cursor:pointer}
 .addbtn.done{background:#EAF3DE;color:#27500A}
 .srclink{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:#185FA5;text-decoration:none;margin-top:8px}
-.botbar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--bg);border-top:.5px solid var(--border);box-shadow:0 -2px 12px rgba(23,52,4,.06);padding:14px 12px calc(20px + env(safe-area-inset-bottom,0px))}
+.botbar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--bg);border-top:.5px solid var(--border);box-shadow:0 -2px 12px rgba(23,52,4,.06);padding:20px 12px calc(30px + env(safe-area-inset-bottom,0px))}
 .botinner{max-width:460px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
-.botrow{display:flex;align-items:center;gap:8px;min-height:48px}
+.botrow{display:flex;align-items:center;gap:8px;min-height:60px}
 .botbar .iconbtn{width:44px;height:44px;font-size:19px}
 .botbar .backbtn{width:44px;height:44px;font-size:21px}
 .botbar .addbar{padding:11px 10px}
@@ -221,7 +227,7 @@ button.navi{background:none;border-left:none;border-right:none;border-bottom:non
 var SB_URL='https://qwjpnbclqgeyansbucyh.supabase.co';
 var SB_KEY='sb_publishable_14CmQiM7CkSIAo0yk3SWzg_nzU4j56O';
 var sb=(typeof supabase!=='undefined'&&supabase&&SB_URL)?supabase.createClient(SB_URL,SB_KEY):null;
-var cloud={enabled:!!sb,user:null,localOnly:false,authEmail:'',authPass:'',authMode:'signin',authMsg:'',authErr:''};
+var cloud={enabled:!!sb,booting:!!sb,user:null,localOnly:false,authEmail:'',authPass:'',authMode:'signin',authMsg:'',authErr:''};
 
 
 var P={
@@ -278,13 +284,68 @@ var TYPEMETA={
 };
 var FREQS=[['weekly','Weekly','Wk'],['monthly','Monthly','Mo'],['2months','Every 2 months','2Mo'],['quarterly','Quarterly','Qtr'],['semiannual','Semi-annually','6Mo'],['annual','Annually','Yr'],['custom','Custom days','']];
 var CATS=[{key:'house',label:'House',icon:'home'},{key:'energy',label:'Energy',icon:'bolt'},{key:'water',label:'Water',icon:'droplet'},{key:'air',label:'Air',icon:'wind'},{key:'waste',label:'Waste',icon:'recycle'},{key:'transport',label:'Transport',icon:'car'}];
-var QUAL=[['nontoxic','Non-toxic'],['longlasting','Long-lasting'],['efficient','Efficient'],['circular','Circular'],['costeffective','Cost-effective'],['beautiful','Beautiful']];
+var ECO=[['lifecycle','Lifecycle','Length of life in years'],['production','Production','Harm vs. benefit in its production'],['use','Use','Harm vs. benefit in its use'],['endoflife','End of Life','Harm vs. benefit at end of life']];
 var STATUSMETA={idea:{label:'Idea',bg:'#EAE8DF',tx:'#5F5E5A',dot:'#D3D1C7'},planned:{label:'Planned',bg:'#FAEEDA',tx:'#633806',dot:'#EF9F27'},done:{label:'Done',bg:'#EAF3DE',tx:'#27500A',dot:'#639922'}};
 var MED_INCOME=83730, MED_YEAR=2024;
 var AVAIL={available:{label:'Available',bg:'#EAF3DE',tx:'#27500A'},soon:{label:'Coming soon',bg:'#FAEEDA',tx:'#633806'},future:{label:'Future',bg:'#E6F1FB',tx:'#185FA5'}};
 var NEWSCATS=[{key:'consumables',label:'Consumables',icon:'basket'},{key:'house',label:'House',icon:'home'},{key:'energy',label:'Energy',icon:'bolt'},{key:'water',label:'Water',icon:'droplet'},{key:'air',label:'Air',icon:'wind'},{key:'waste',label:'Waste',icon:'recycle'},{key:'transport',label:'Transport',icon:'car'}];
 var NEWNESS={new:{label:'New',color:'#639922'},unviewed:{label:'Unread',color:'#EF9F27'},viewed:{label:'Read',color:'#B4B2A9'}};
 var KEY='sh_consumables_v1';
+
+// Eco Score rubric text (editable via Definitions). Each sub-score is 0-10; the
+// overall score = (lifecycle+production+use+endoflife) * 2.5  → 0-100.
+var HARM_SCALE='10 — No harm and significant benefit · 9 — No harm and some benefit · 8 — No harm and no benefit · 7 — Insignificant harm and significant benefit · 6 — Insignificant harm and some benefit · 5 — Some harm and significant benefit · 4 — Some harm and some benefit · 3 — Insignificant harm and insignificant benefit · 2 — Some harm and insignificant benefit · 1 — Insignificant harm and no benefit · 0 — Some or significant harm and no benefit';
+var DEFAULT_RUBRIC={
+ overall:'Every product, material, practice, or system is scored 0–100. The score is the sum of four sub-scores (Lifecycle, Production, Use, End of Life), each rated 0–10 and weighted 2.5, for a top score of 100.',
+ lifecycle:'Length of life in years. 10 — 10+ years · 9 — 9 years · 8 — 8 years · 7 — 7 years · 6 — 6 years · 5 — 5 years · 4 — 4 years · 3 — 3 years · 2 — 2 years · 1 — 1 year · 0 — less than 1 year',
+ production:'Does not harm people or planet in its production. '+HARM_SCALE,
+ use:'Does not harm people or planet in its use. '+HARM_SCALE,
+ endoflife:'Does not harm people or planet in its end of life. '+HARM_SCALE
+};
+// Category definitions + keyword stems. The crawler reads THIS (per-user, synced)
+// to classify articles and to drop anything that fits no category.
+var DEFAULT_CATS=[
+ {key:'consumables',label:'Consumables',def:'Food, Drink, Cleaning Products, Personal Care Products, and Other.',kw:'food,drink,beverage,grocery,snack,pantry,cleaning product,detergent,dish soap,laundry,soap,shampoo,conditioner,cosmetic,skincare,personal care,toothpaste,deodorant,diaper,refill,reusable,compostable packaging,plastic-free,zero-waste,zero waste,bulk store,toiletr,single-use,single use'},
+ {key:'house',label:'Home',def:'Products, materials, practices, and systems for home building, maintenance, and systems.',kw:'home,house,building material,construction,insulat,timber,lumber,concrete,cement,hempcrete,mycelium,cork floor,flooring,roofing,drywall,plaster,paint,cabinet,furniture,appliance,renovat,retrofit,maintenance,sustainable building,biomaterial,bio-based'},
+ {key:'water',label:'Water',def:'Products, materials, practices, and systems for water systems.',kw:'water,rainwater,greywater,graywater,grey water,drought,reservoir,aquifer,irrigat,plumbing,faucet,toilet,wastewater,desalinat,stormwater,watershed,potable,filtration,well'},
+ {key:'air',label:'Air',def:'Products, materials, practices, and systems for air systems and maintenance.',kw:'air quality,indoor air,voc,ventilat,hrv,erv,purifier,smog,particulate,pm2.5,hepa,filtrat,air pollution,radon,formaldehyde,off-gas,humidity,mold'},
+ {key:'waste',label:'Waste',def:'Products, materials, practices, and systems for end of life systems.',kw:'waste,recycl,compost,landfill,trash,garbage,circular econom,circularit,food waste,plastic waste,e-waste,upcycl,salvage,deconstruction,reuse,biodegradable,disposal'},
+ {key:'transport',label:'Transportation',def:'Products, materials, practices, and systems for transportation.',kw:'transport,electric vehicle,ev,evs,e-bike,bike,bicycle,cargo bike,cycling,transit,mobility,commut,vehicle-to-home,v2h,charging station,charger,scooter'},
+ {key:'energy',label:'Energy',def:'Products, materials, practices, and systems for energy systems and use.',kw:'energy,solar,photovoltaic,pv,batter,storage,grid,heat pump,heat-pump,electric,power,renewable,wind turbine,geotherm,sodium-ion,lithium,kwh,kilowatt,inverter,off-grid,microgrid,led,efficiency'}
+];
+function defaultConfig(){return {threshold:50,rubric:JSON.parse(JSON.stringify(DEFAULT_RUBRIC)),cats:JSON.parse(JSON.stringify(DEFAULT_CATS))};}
+function catDef(key){var c=state.config&&state.config.cats;if(c){for(var i=0;i<c.length;i++)if(c[i].key===key)return c[i];}return DEFAULT_CATS[0];}
+function catKw(key){var c=catDef(key);return (c.kw||'').split(',').map(function(s){return s.trim().toLowerCase();}).filter(Boolean);}
+
+// ----- Eco Score helpers (unified across items, stores, needs, news) -----
+function isRated(q){if(!q||q.length<4)return false;for(var i=0;i<4;i++){var v=q[i];if(v===''||v==null)return false;v=Number(v);if(!(v>=0&&v<=10))return false;}return true;}
+function ecoScore(q){if(!isRated(q))return null;var s=0;for(var i=0;i<4;i++)s+=Number(q[i]);return Math.round(s*2.5);}
+function scoreCls(v){v=Number(v);return v>=75?'e-boldgreen':v>=50?'e-green':v>=25?'e-amber':'e-red';}
+function scoreBadge(q){var v=ecoScore(q);return v==null?'':'<span class="eco '+scoreCls(v)+'" title="Eco Score '+v+'/100">'+v+'</span>';}
+function fixQ4(q){ // migrate any legacy q into a 4-length [lifecycle,production,use,endoflife]
+ if(isRated(q)&&q.length===4)return q.slice(0,4);
+ if(q&&q.length>=6){var nt=Number(q[0])||5,ll=Number(q[1])||5,ef=Number(q[2])||5,ci=Number(q[3])||5;
+  return [ll, Math.round((nt+ci)/2), Math.round((ef+nt)/2), ci];}
+ if(q&&q.length>=1){var v=Number(q[0]);if(v>=0)return [v,v,v,v];}
+ return null;
+}
+function qFromEco(eco){var v=Number(eco);return (eco===''||eco==null||!(v>=0))?null:[v,v,v,v];}
+// Suggest 4 sub-scores for a news article from its text (the app's guess; user can change)
+function estimateArticleQ(a){
+ var txt=((a.title||'')+' '+(a.body||'')).toLowerCase();
+ function any(list){for(var i=0;i<list.length;i++)if(txt.indexOf(list[i])>=0)return true;return false;}
+ var POS=['durable','long-lasting','long lasting','lasts','reusable','repair','recycl','compost','renewable','biodegrad','non-toxic','nontoxic','low-voc','zero-voc','zero voc','natural','organic','efficient','saves','sustainable','regenerat','circular','salvage','reclaimed','passive'];
+ var NEG=['toxic','pollut','landfill','single-use','single use','disposable','fossil','emission','pfas','microplastic','harmful','leach','carcinogen'];
+ var pos=any(POS),neg=any(NEG);
+ var base=neg?4:(pos?7:6);
+ var ll=base, pr=base, us=base, ef=base;
+ if(any(['durable','long-lasting','long lasting','lasts','decades','lifetime']))ll=Math.min(10,ll+2);
+ if(any(['recycl','compost','circular','salvage','reclaimed','biodegrad','reuse']))ef=Math.min(10,ef+2);
+ if(any(['non-toxic','nontoxic','low-voc','zero-voc','natural','organic','renewable']))pr=Math.min(10,pr+2);
+ if(any(['efficient','saves','low energy','passive','clean']))us=Math.min(10,us+2);
+ function cl(v){return Math.max(0,Math.min(10,v));}
+ return [cl(ll),cl(pr),cl(us),cl(ef)];
+}
 
 var state={
  items:[], stores:[], sort:'smart',
@@ -293,32 +354,69 @@ var state={
  editingId:null, detailsOpen:false, newName:'',
  draft:{type:'regular',store:'',freqUnit:'weekly',freqDays:30,tag:'',eco:''},
  overlay:null, view:'consumables',
- bulkMode:false, bulkSel:{}, bulkDraft:{type:'__keep__',store:'__keep__',eco:'__keep__',tagOn:false,tag:''},
+ bulkMode:false, bulkSel:{}, bulkDraft:{type:'__keep__',store:'__keep__',qOn:false,q:['','','',''],tagOn:false,tag:''},
  needsTab:'dashboard', needsFilter:'all', needs:[], nEditingId:null, nExpandedId:null,
  newsFilterCat:'all', newsFilterAvail:'all', newsFilterHL:false, newsSort:'new', news:[], newsExpandedId:null, newsEditingId:null,
- newsOrder:null, newsSources:[], sourceInput:''
+ newsOrder:null, newsSources:[], sourceInput:'',
+ newsAddId:null, newsAddDraft:null, newsArchiveOpen:false,
+ config:defaultConfig()
 };
 
 function migrateStores(arr){
  return (arr||[]).map(function(s){
-  if(typeof s==='string')return {id:uid(),name:s,eco:'',category:'',note:''};
-  return {id:s.id||uid(),name:s.name||'',eco:(s.eco==null?'':s.eco),category:s.category||'',note:s.note||''};
+  if(typeof s==='string')return {id:uid(),name:s,q:null,category:'',note:''};
+  var q=s.q!==undefined?fixQ4(s.q):qFromEco(s.eco);
+  return {id:s.id||uid(),name:s.name||'',q:q,category:s.category||'',note:s.note||''};
  });
 }
+function migrateItems(arr){
+ return (arr||[]).map(function(it){
+  var q=it.q!==undefined?fixQ4(it.q):qFromEco(it.eco);
+  it.q=q; delete it.eco; return it;
+ });
+}
+function migrateNeeds(arr){arr.forEach(function(n){n.q=fixQ4(n.q)||[5,5,5,5];});return arr;}
+function migrateNewsArr(arr){arr.forEach(function(a){if(!isRated(a.q))a.q=estimateArticleQ(a);if(!a.seenAt)a.seenAt=a.publishedAt||Date.now();if(a.archived===undefined)a.archived=false;});return arr;}
+function mergeConfig(c){var base=defaultConfig();if(!c)return base;if(typeof c.threshold==='number')base.threshold=c.threshold;if(c.rubric)base.rubric=Object.assign(base.rubric,c.rubric);if(Array.isArray(c.cats)){base.cats.forEach(function(bc){var m=c.cats.filter(function(x){return x.key===bc.key;})[0];if(m){if(m.label!=null)bc.label=m.label;if(m.def!=null)bc.def=m.def;if(m.kw!=null)bc.kw=m.kw;}});}return base;}
 function load(){
  try{var raw=localStorage.getItem(KEY);
   if(raw){var d=JSON.parse(raw);
-   state.items=d.items||[];state.stores=migrateStores(d.stores);state.sort=d.sort||'smart';
+   state.items=migrateItems(d.items||[]);state.stores=migrateStores(d.stores);state.sort=d.sort||'smart';
    if(d.draft)state.draft=Object.assign(state.draft,d.draft);
-   state.needs=Array.isArray(d.needs)?d.needs:seedNeeds();
-   state.news=mergeNews(Array.isArray(d.news)?d.news:[],seedNews());
+   state.needs=migrateNeeds(Array.isArray(d.needs)?d.needs:seedNeeds());
+   state.news=migrateNewsArr(mergeNews(Array.isArray(d.news)?d.news:[],seedNews()));
    state.newsSources=Array.isArray(d.newsSources)?d.newsSources:[];
-  } else { state.needs=seedNeeds(); state.news=seedNews(); }
- }catch(e){ if(!state.needs.length)state.needs=seedNeeds(); if(!state.news.length)state.news=seedNews(); }
+   state.config=mergeConfig(d.config);
+  } else { state.needs=migrateNeeds(seedNeeds()); state.news=migrateNewsArr(seedNews()); }
+ }catch(e){ if(!state.needs.length)state.needs=migrateNeeds(seedNeeds()); if(!state.news.length)state.news=migrateNewsArr(seedNews()); }
+ newsLifecycle(true);
 }
 function save(){
- try{localStorage.setItem(KEY,JSON.stringify({items:state.items,stores:state.stores,sort:state.sort,draft:state.draft,needs:state.needs,news:state.news,newsSources:state.newsSources}));}catch(e){}
+ try{localStorage.setItem(KEY,JSON.stringify({items:state.items,stores:state.stores,sort:state.sort,draft:state.draft,needs:state.needs,news:state.news,newsSources:state.newsSources,config:state.config}));}catch(e){}
  if(cloud.enabled&&cloud.user)cloudSync();
+}
+// Archive (30d) / delete (90d) read, non-added, non-highlighted articles.
+// "First-pulled" age = now - seenAt. Recomputes archived each pass so an article
+// that is later re-read/added/highlighted pops back out of the archive.
+function newsLifecycle(doPurge){
+ var now=Date.now(),D=86400000,changed=false;
+ if(doPurge){
+  var keep=[],removed=[];
+  state.news.forEach(function(a){
+   var stale=a.viewed&&!a.added&&!a.highlight&&(now-(a.seenAt||a.publishedAt||now))>=90*D;
+   if(stale){removed.push(a);}else{keep.push(a);}
+  });
+  if(removed.length){
+   if(cloud.enabled&&cloud.user&&sb){removed.forEach(function(a){try{sb.from('news_articles').delete().eq('id',a.id);}catch(e){}});}
+   state.news=keep;changed=true;
+  }
+ }
+ state.news.forEach(function(a){
+  var arch=a.viewed&&!a.added&&!a.highlight&&(now-(a.seenAt||a.publishedAt||now))>=30*D;
+  if(!!a.archived!==arch){a.archived=arch;changed=true;}
+ });
+ if(changed)save();
+ return changed;
 }
 function storeNames(){return state.stores.map(function(s){return s.name;}).filter(Boolean);}
 
@@ -382,6 +480,16 @@ function groups(){
 }
 
 function ecoOptions(sel){var o='<option value="">Not rated</option>';for(var i=0;i<=10;i++){o+='<option value="'+i+'"'+(String(sel)===String(i)?' selected':'')+'>'+i+'</option>';}return o;}
+function ecoSubOpts(sel){var o='<option value="">—</option>';for(var i=0;i<=10;i++){o+='<option value="'+i+'"'+(String(sel)===String(i)?' selected':'')+'>'+i+'</option>';}return o;}
+function ensureQ(obj){if(!Array.isArray(obj.q)||obj.q.length<4){var old=Array.isArray(obj.q)?obj.q:[];obj.q=[old[0]==null?'':old[0],old[1]==null?'':old[1],old[2]==null?'':old[2],old[3]==null?'':old[3]];}return obj.q;}
+// 4 sub-score dropdowns + live total. idAttr is e.g. ' data-id="x"' / ' data-i="0"' / ''.
+function qGrid(q,act,idAttr){
+ q=q||[];idAttr=idAttr||'';
+ var fields=ECO.map(function(c,i){return '<div class="f"><label>'+c[1]+'</label><select data-act="'+act+'"'+idAttr+' data-k="'+i+'">'+ecoSubOpts(q[i]==null?'':q[i])+'</select></div>';}).join('');
+ var v=ecoScore(q);
+ var tot='<div class="qtot">Eco Score '+(v==null?'<span class="muted">— rate all four</span>':'<span class="eco '+scoreCls(v)+'">'+v+'</span> / 100')+'</div>';
+ return '<div class="slabel qlbl">Eco Score <span class="muted">(0–10 each)</span></div><div class="grid2">'+fields+'</div>'+tot;
+}
 function storeOptions(sel){var o='<option value="">No store</option>';storeNames().forEach(function(s){o+='<option'+(s===sel?' selected':'')+'>'+esc(s)+'</option>';});return o;}
 function freqOptions(sel){var o='';FREQS.forEach(function(f){o+='<option value="'+f[0]+'"'+(f[0]===sel?' selected':'')+'>'+f[1]+'</option>';});return o;}
 
@@ -407,8 +515,8 @@ function draftForm(){
    (d.type==='recurring'?freq:'')+
    '<div class="f"><label>Store</label><select data-act="dstore">'+storeOptions(d.store)+'</select></div>'+
    '<div class="f"><label>Tag</label><input data-act="dtag" maxlength="40" value="'+escA(d.tag)+'" placeholder="e.g. Dairy"/></div>'+
-   '<div class="f"><label>Eco rating</label><select data-act="deco">'+ecoOptions(d.eco)+'</select></div>'+
   '</div>'+
+  qGrid(d.q,'dq','')+
   (storeNames().length?'':'<p class="hint">Add stores from Menu → Stores to use the store field.</p>')+
  '</div>';
 }
@@ -433,7 +541,7 @@ function rowDisplay(it){
  if(it.store)meta.push(esc(it.store));
  if(it.tag)meta.push(esc(trunc(it.tag)));
  if(it.type==='recurring')meta.push(freqAbbr(it));
- var badge=(it.eco===''||it.eco==null)?'':'<span class="eco '+ecoCls(it.eco)+'">'+it.eco+'</span>';
+ var badge=scoreBadge(it.q);
  if(state.bulkMode){
   var sel=!!state.bulkSel[it.id];
   return '<div class="item'+(sel?' bsel':'')+'">'+
@@ -464,8 +572,8 @@ function rowEdit(it){
    (it.type==='recurring'?freq:'')+
    '<div class="f"><label>Store</label><select data-act="estore" data-id="'+it.id+'">'+storeOptions(it.store)+'</select></div>'+
    '<div class="f"><label>Tag</label><input data-act="etag" data-id="'+it.id+'" maxlength="40" value="'+escA(it.tag)+'"/></div>'+
-   '<div class="f"><label>Eco rating</label><select data-act="eeco" data-id="'+it.id+'">'+ecoOptions(it.eco)+'</select></div>'+
   '</div>'+
+  qGrid(it.q,'eq',' data-id="'+it.id+'"')+
   '<div class="erow2">'+
    '<button class="del" data-act="del" data-id="'+it.id+'">'+ico('trash')+' Delete</button>'+
    '<button class="done" data-act="done" data-id="'+it.id+'">Done</button>'+
@@ -506,10 +614,9 @@ function overlayHTML(){
   var storeSel='<select data-act="bulkstore"><option value="__keep__"'+(bd.store==='__keep__'?' selected':'')+'>Leave unchanged</option>'+
     '<option value=""'+(bd.store===''?' selected':'')+'>No store</option>'+
     storeNames().map(function(s){return '<option'+(s===bd.store?' selected':'')+'>'+esc(s)+'</option>';}).join('')+'</select>';
-  var ecoSel='<select data-act="bulkeco"><option value="__keep__"'+(bd.eco==='__keep__'?' selected':'')+'>Leave unchanged</option>'+
-    '<option value=""'+(bd.eco===''?' selected':'')+'>Not rated</option>';
-  for(var ei=0;ei<=10;ei++){ecoSel+='<option value="'+ei+'"'+(String(bd.eco)===String(ei)?' selected':'')+'>'+ei+'</option>';}
-  ecoSel+='</select>';
+  var ecoField=bd.qOn
+    ? qGrid(bd.q,'bulkq','')+'<button class="bulkkeep" data-act="bulkqon">Leave Eco Score unchanged</button>'
+    : '<button class="bulkkeep" data-act="bulkqon">Eco Score left unchanged — tap to set</button>';
   var tagField=bd.tagOn
     ? '<div style="display:flex;gap:8px;align-items:center;"><input data-act="bulktag" maxlength="40" value="'+escA(bd.tag)+'" placeholder="New tag (blank clears)" style="flex:1"/><button class="bulkkeep" data-act="bulktagon">Keep</button></div>'
     : '<button class="bulkkeep" data-act="bulktagon">Tag left unchanged — tap to change</button>';
@@ -518,7 +625,7 @@ function overlayHTML(){
    '<div class="f"><label>Type</label>'+typeSel+'</div>'+
    '<div class="f"><label>Store</label>'+storeSel+'</div>'+
    '<div class="f"><label>Tag</label>'+tagField+'</div>'+
-   '<div class="f"><label>Eco rating</label>'+ecoSel+'</div>'+
+   '<div class="f"><label>Eco Score</label>'+ecoField+'</div>'+
    '<div class="bulkactions"><button class="clearbtn" data-act="closeovl">Cancel</button><button class="done" data-act="bulkapply"'+(n?'':' disabled')+'>Apply to '+n+'</button></div>'+
   '</div>';
   return ovlWrap('Bulk edit',bbody);
@@ -536,6 +643,38 @@ function overlayHTML(){
    '<div class="bulkactions"><button class="clearbtn" data-act="closeovl">Cancel</button><button class="bulkdelbtn" data-act="bulkdelete" style="justify-content:center;">'+ico('trash')+'Delete '+dn+'</button></div>';
   return ovlWrap('Delete items',dbody);
  }
+ if(state.overlay==='newsadd'){
+  var d=state.newsAddDraft; if(!d)return '';
+  var modeSeg='<div class="seg" style="margin-bottom:12px;">'+
+    '<button data-act="newsaddmode" data-v="consumables" class="'+(d.mode==='consumables'?'on':'')+'">'+ico('basket')+'Consumable</button>'+
+    '<button data-act="newsaddmode" data-v="needs" class="'+(d.mode==='needs'?'on':'')+'">'+ico('bulb')+'Need / Idea</button>'+
+  '</div>';
+  var fields;
+  if(d.mode==='consumables'){
+   var nfreq=d.type==='recurring'?freqField(d.freqUnit,d.freqDays,'na'):'';
+   fields=segType(d.type,'na')+'<div class="grid2">'+
+     (d.type==='recurring'?nfreq:'')+
+     '<div class="f"><label>Store</label><select data-act="nastore">'+storeOptions(d.store)+'</select></div>'+
+     '<div class="f"><label>Tag</label><input data-act="natag" maxlength="40" value="'+escA(d.tag)+'" placeholder="e.g. Dairy"/></div>'+
+    '</div>';
+  } else {
+   var ncatOpts=CATS.map(function(c){return '<option value="'+c.key+'"'+(d.category===c.key?' selected':'')+'>'+c.label+'</option>';}).join('');
+   var ncostOpts=[[1,'$ (low)'],[2,'$$ (medium)'],[3,'$$$ (high)']].map(function(o){return '<option value="'+o[0]+'"'+(Number(d.cost)===o[0]?' selected':'')+'>'+o[1]+'</option>';}).join('');
+   var nstOpts=['idea','planned','done'].map(function(k){return '<option value="'+k+'"'+(d.status===k?' selected':'')+'>'+statusMeta(k).label+'</option>';}).join('');
+   fields='<div class="f" style="margin-bottom:10px;"><label>Description</label><textarea data-act="nadesc" placeholder="What it is and why it helps...">'+esc(d.desc)+'</textarea></div>'+
+    '<div class="grid2"><div class="f"><label>Category</label><select data-act="nacat">'+ncatOpts+'</select></div>'+
+    '<div class="f"><label>Cost tier</label><select data-act="nacost">'+ncostOpts+'</select></div>'+
+    '<div class="f"><label>ROI (years)</label><input type="number" min="0" data-act="naroi" value="'+(d.roi==null?'':d.roi)+'" placeholder="e.g. 7"/></div>'+
+    '<div class="f"><label>Stage</label><select data-act="nastatus">'+nstOpts+'</select></div></div>';
+  }
+  var nbody='<p class="bulknote">Pre-filled from the article — Eco Score is a suggestion, adjust any sub-score. On Done, this article is marked Added and you stay on the News page.</p>'+
+   modeSeg+
+   '<div class="f" style="margin-bottom:10px;"><label>Name</label><input data-act="naname" value="'+escA(d.name)+'" placeholder="Name"/></div>'+
+   fields+
+   qGrid(d.q,'naq','')+
+   '<div class="bulkactions"><button class="clearbtn" data-act="newsaddcancel">Cancel</button><button class="done" data-act="newsadddone">Done</button></div>';
+  return ovlWrap('Add from article',nbody);
+ }
  return '';
 }
 function ovlWrap(title,body){
@@ -546,14 +685,12 @@ function ovlWrap(title,body){
 
 function renderStores(){
  var list=state.stores.map(function(s,i){
-  var badge=(s.eco===''||s.eco==null)?'':'<span class="eco '+ecoCls(s.eco)+'">'+s.eco+'</span>';
+  var badge=scoreBadge(s.q);
   return '<div class="scard">'+
    '<div class="scardtop"><input class="sname" data-act="sname" data-i="'+i+'" data-orig="'+escA(s.name)+'" value="'+escA(s.name)+'" placeholder="Store name"/>'+badge+
      '<button data-act="sdel" data-i="'+i+'" aria-label="Delete store">'+ico('trash')+'</button></div>'+
-   '<div class="grid2">'+
-     '<div class="f"><label>Eco rating (0–10)</label><select data-act="seco" data-i="'+i+'">'+ecoOptions(s.eco)+'</select></div>'+
-     '<div class="f"><label>Category</label><input data-act="scat" data-i="'+i+'" value="'+escA(s.category||'')+'" placeholder="Grocery, refill…"/></div>'+
-   '</div>'+
+   '<div class="f"><label>Category</label><input data-act="scat" data-i="'+i+'" value="'+escA(s.category||'')+'" placeholder="Grocery, refill…"/></div>'+
+   qGrid(s.q,'sq',' data-i="'+i+'"')+
    '<div class="f"><label>Notes</label><textarea data-act="snote" data-i="'+i+'" placeholder="Location, hours, what you buy here…">'+esc(s.note||'')+'</textarea></div>'+
   '</div>';
  }).join('');
@@ -591,6 +728,7 @@ function render(){
  refreshRecurring();
  if(state.view!=='news')state.newsOrder=null;
  var app=document.getElementById('app');
+ if(cloud.booting){app.innerHTML='<div style="max-width:360px;margin:44px auto 0;text-align:center;"><div style="width:56px;height:56px;border-radius:50%;background:var(--leaf);display:flex;align-items:center;justify-content:center;color:var(--greentx);margin:0 auto 14px;font-size:26px;">'+ico('plant')+'</div><div style="font-size:20px;font-weight:500;color:var(--ink);">The Sustainable Home</div></div>';return;}
  if(cloud.enabled&&!cloud.user&&!cloud.localOnly){app.innerHTML=renderLogin();return;}
  if(state.view==='stores'){app.innerHTML=renderStores()+overlayHTML()+bottomBar();return;}
  if(state.view==='needs'){app.innerHTML=renderNeeds()+overlayHTML()+bottomBar();return;}
@@ -645,10 +783,38 @@ function addItem(){
  var name=(state.newName||'').trim();
  if(!name)return;
  var d=state.draft;
- state.items.push({id:uid(),name:name,type:d.type,freqUnit:d.freqUnit,freqDays:d.freqDays,tag:d.tag,store:d.store,eco:d.eco,checked:false,checkedAt:null,createdAt:Date.now()});
- state.newName='';state.draft.tag='';state.draft.eco='';
+ state.items.push({id:uid(),name:name,type:d.type,freqUnit:d.freqUnit,freqDays:d.freqDays,tag:d.tag,store:d.store,q:(isRated(d.q)?d.q.slice():null),checked:false,checkedAt:null,createdAt:Date.now()});
+ state.newName='';state.draft.tag='';state.draft.q=null;
  save();render();
  var el=document.getElementById('newname');if(el)el.focus();
+}
+function openNewsAdd(a){
+ state.newsAddId=a.id;
+ state.newsAddDraft={
+  mode:(a.category==='consumables'?'consumables':'needs'),
+  name:a.title||'', desc:a.body||'',
+  q:(isRated(a.q)?a.q.slice():estimateArticleQ(a)),
+  type:'regular', store:'', tag:'', freqUnit:'weekly', freqDays:7,
+  category:(a.category==='consumables'?'house':a.category), cost:2, roi:null, status:'idea',
+  source:a.source||'', url:a.url||''
+ };
+ state.overlay='newsadd';
+ render();
+}
+function applyNewsAdd(){
+ var d=state.newsAddDraft; if(!d)return;
+ var a=newsById(state.newsAddId);
+ var name=(d.name||'').trim()||'Untitled';
+ var q=isRated(d.q)?d.q.slice():null;
+ if(d.mode==='consumables'){
+  state.items.push({id:uid(),name:name,type:d.type,freqUnit:d.freqUnit,freqDays:d.freqDays,tag:(d.tag||'').trim(),store:d.store,q:q,checked:false,checkedAt:null,createdAt:Date.now()});
+ } else {
+  var cat=(d.category==='consumables')?'house':d.category;
+  state.needs.push({id:uid(),category:cat,name:name,desc:d.desc||'',cost:Number(d.cost)||2,roi:(d.roi==null||d.roi==='')?null:Number(d.roi),status:d.status||'idea',q:(q||[5,5,5,5]),sources:(d.source||d.url)?[[d.source,d.url]]:[]});
+ }
+ if(a){a.added=true;}
+ state.overlay=null;state.newsAddId=null;state.newsAddDraft=null;
+ save();render(); // stays on the News page
 }
 
 var app=document.getElementById('app');
@@ -675,11 +841,13 @@ app.addEventListener('click',function(e){
   case 'openmenu':state.overlay='menu';render();break;
   case 'openstores':state.overlay=null;state.view='stores';render();break;
   case 'backhome':state.overlay=null;state.view='consumables';render();break;
-  case 'nav':state.overlay=null;state.view=t.getAttribute('data-v');render();if(state.view==='news')refreshNewsFromCloud();break;
+  case 'nav':state.overlay=null;state.view=t.getAttribute('data-v');if(state.view==='news'){newsLifecycle(true);}render();if(state.view==='news')refreshNewsFromCloud();break;
+  case 'newsarchtoggle':state.newsArchiveOpen=!state.newsArchiveOpen;render();break;
+  case 'defreset':state.config=defaultConfig();save();render();break;
   case 'ntab':state.needsTab=t.getAttribute('data-v');state.nExpandedId=null;state.nEditingId=null;render();break;
   case 'nfilter':state.needsFilter=t.getAttribute('data-v');render();break;
   case 'nexpand':state.nExpandedId=(state.nExpandedId===id?null:id);state.nEditingId=null;render();break;
-  case 'nadd':{var nc=state.needsTab;if(nc==='dashboard')nc='house';var nid=uid();state.needs.push({id:nid,category:nc,name:'',desc:'',cost:2,roi:null,status:'idea',q:[5,5,5,5,5,5],sources:[]});state.needsTab=nc;state.nEditingId=nid;state.nExpandedId=nid;save();render();var nel=document.querySelector('[data-act="nname"]');if(nel)nel.focus();break;}
+  case 'nadd':{var nc=state.needsTab;if(nc==='dashboard')nc='house';var nid=uid();state.needs.push({id:nid,category:nc,name:'',desc:'',cost:2,roi:null,status:'idea',q:[5,5,5,5],sources:[]});state.needsTab=nc;state.nEditingId=nid;state.nExpandedId=nid;save();render();var nel=document.querySelector('[data-act="nname"]');if(nel)nel.focus();break;}
   case 'nedit':state.nEditingId=id;state.nExpandedId=id;render();break;
   case 'ndone':state.nEditingId=null;save();render();break;
   case 'ndel':state.needs=state.needs.filter(function(x){return x.id!==id;});state.nEditingId=null;state.nExpandedId=null;save();render();break;
@@ -701,8 +869,11 @@ app.addEventListener('click',function(e){
   case 'newsedit':state.newsEditingId=id;state.newsExpandedId=id;render();break;
   case 'newsdone':state.newsEditingId=null;save();render();break;
   case 'newsdel':if(cloud.enabled&&cloud.user&&sb){try{sb.from('news_articles').delete().eq('id',id);}catch(e){}}state.news=state.news.filter(function(x){return x.id!==id;});state.newsEditingId=null;state.newsExpandedId=null;save();render();break;
-  case 'newsaddnew':{var naw=uid();state.news.unshift({id:naw,title:'',source:'',url:'',body:'',category:'house',availability:'available',publishedAt:Date.now(),viewed:true,added:false});state.newsEditingId=naw;state.newsExpandedId=naw;save();render();var ntf=document.querySelector('[data-act="newstitle"]');if(ntf)ntf.focus();break;}
-  case 'newsact':{var an=newsById(id);if(an){if(an.category==='consumables'){var iid=uid();state.items.push({id:iid,name:an.title,type:'regular',freqUnit:'weekly',freqDays:7,tag:'',store:'',eco:'',checked:false,checkedAt:null,createdAt:Date.now()});an.added=true;state.view='consumables';state.editingId=iid;}else{var nid2=uid();state.needs.push({id:nid2,category:an.category,name:an.title,desc:an.body,cost:2,roi:null,status:'idea',q:[5,5,5,5,5,5],sources:[[an.source,an.url]]});an.added=true;state.view='needs';state.needsTab=an.category;state.nEditingId=nid2;state.nExpandedId=nid2;}save();render();}break;}
+  case 'newsaddnew':{var naw=uid();state.news.unshift({id:naw,title:'',source:'',url:'',body:'',category:'house',availability:'available',publishedAt:Date.now(),seenAt:Date.now(),viewed:true,added:false,highlight:false,archived:false,q:null});state.newsEditingId=naw;state.newsExpandedId=naw;save();render();var ntf=document.querySelector('[data-act="newstitle"]');if(ntf)ntf.focus();break;}
+  case 'newsact':{var an=newsById(id);if(an){openNewsAdd(an);}break;}
+  case 'newsaddmode':if(state.newsAddDraft){state.newsAddDraft.mode=t.getAttribute('data-v');render();}break;
+  case 'newsaddcancel':state.overlay=null;state.newsAddId=null;state.newsAddDraft=null;render();break;
+  case 'newsadddone':applyNewsAdd();break;
   case 'setsort':state.sort=t.getAttribute('data-v');state.overlay=null;save();render();break;
   case 'pillstore':state.filter.store=t.getAttribute('data-v');render();break;
   case 'clearfilter':state.filter.type='';state.filter.freq='';state.filter.tag='';render();break;
@@ -716,13 +887,15 @@ app.addEventListener('click',function(e){
   case 'bulkdelask':if(bulkSelCount()>0){state.overlay='bulkdel';render();}break;
   case 'bulkdelete':{state.items=state.items.filter(function(i){return !state.bulkSel[i.id];});state.overlay=null;state.bulkMode=false;state.bulkSel={};save();render();break;}
   case 'bulktagon':state.bulkDraft.tagOn=!state.bulkDraft.tagOn;render();break;
-  case 'bulkapply':{var bd=state.bulkDraft;state.items.forEach(function(i){if(!state.bulkSel[i.id])return;if(bd.type!=='__keep__'){i.type=bd.type;if(i.type==='recurring'&&!i.freqUnit)i.freqUnit='weekly';}if(bd.store!=='__keep__')i.store=bd.store;if(bd.eco!=='__keep__')i.eco=(bd.eco===''?'':Number(bd.eco));if(bd.tagOn)i.tag=(bd.tag||'').trim();});state.overlay=null;state.bulkMode=false;state.bulkSel={};state.bulkDraft={type:'__keep__',store:'__keep__',eco:'__keep__',tagOn:false,tag:''};save();render();break;}
+  case 'bulkqon':state.bulkDraft.qOn=!state.bulkDraft.qOn;render();break;
+  case 'natype':if(state.newsAddDraft){state.newsAddDraft.type=t.getAttribute('data-type');render();}break;
+  case 'bulkapply':{var bd=state.bulkDraft;state.items.forEach(function(i){if(!state.bulkSel[i.id])return;if(bd.type!=='__keep__'){i.type=bd.type;if(i.type==='recurring'&&!i.freqUnit)i.freqUnit='weekly';}if(bd.store!=='__keep__')i.store=bd.store;if(bd.qOn&&isRated(bd.q))i.q=bd.q.slice();if(bd.tagOn)i.tag=(bd.tag||'').trim();});state.overlay=null;state.bulkMode=false;state.bulkSel={};state.bulkDraft={type:'__keep__',store:'__keep__',qOn:false,q:['','','',''],tagOn:false,tag:''};save();render();break;}
   case 'edit':state.editingId=(state.editingId===id?null:id);render();break;
   case 'done':state.editingId=null;render();break;
   case 'del':if(it){state.items=state.items.filter(function(i){return i.id!==id;});state.editingId=null;save();render();}break;
   case 'dtype':state.draft.type=t.getAttribute('data-type');save();render();break;
   case 'etype':if(it){it.type=t.getAttribute('data-type');if(it.type==='recurring'&&!it.freqUnit)it.freqUnit='weekly';save();render();}break;
-  case 'saddstore':state.stores.push({id:uid(),name:'',eco:'',category:'',note:''});save();render();var ins=document.querySelectorAll('[data-act="sname"]');if(ins.length)ins[ins.length-1].focus();break;
+  case 'saddstore':state.stores.push({id:uid(),name:'',q:null,category:'',note:''});save();render();var ins=document.querySelectorAll('[data-act="sname"]');if(ins.length)ins[ins.length-1].focus();break;
   case 'sdel':{var di=Number(t.getAttribute('data-i'));var nm=state.stores[di]?state.stores[di].name:'';state.stores.splice(di,1);state.items.forEach(function(i){if(i.store===nm)i.store='';});if(state.filter.store===nm)state.filter.store='';save();render();break;}
  }
 });
@@ -733,6 +906,15 @@ app.addEventListener('input',function(e){
  switch(act){
   case 'newname':state.newName=t.value;break;
   case 'sourceinput':state.sourceInput=t.value;break;
+  case 'naname':if(state.newsAddDraft){state.newsAddDraft.name=t.value;}break;
+  case 'nadesc':if(state.newsAddDraft){state.newsAddDraft.desc=t.value;}break;
+  case 'natag':if(state.newsAddDraft){state.newsAddDraft.tag=t.value;}break;
+  case 'naroi':if(state.newsAddDraft){var rvv=t.value.trim();state.newsAddDraft.roi=rvv===''?null:Number(rvv);}break;
+  case 'defrub':if(state.config&&state.config.rubric){state.config.rubric[t.getAttribute('data-k')]=t.value;save();}break;
+  case 'defcatlabel':{var dcl=catDef(t.getAttribute('data-key'));if(dcl){dcl.label=t.value;save();}break;}
+  case 'defcatdef':{var dcd=catDef(t.getAttribute('data-key'));if(dcd){dcd.def=t.value;save();}break;}
+  case 'defcatkw':{var dck=catDef(t.getAttribute('data-key'));if(dck){dck.kw=t.value;save();}break;}
+  case 'defthreshold':{var dtv=parseInt(t.value,10);state.config.threshold=isNaN(dtv)?0:Math.max(0,Math.min(100,dtv));save();}break;
   case 'authemail':cloud.authEmail=t.value;break;
   case 'authpass':cloud.authPass=t.value;break;
   case 'search':state.search=t.value;renderListOnly();break;
@@ -759,24 +941,32 @@ app.addEventListener('change',function(e){
  var act=t.getAttribute('data-act');var id=t.getAttribute('data-id');var it=id?itemById(id):null;
  switch(act){
   case 'estore':if(it){it.store=t.value;save();render();}break;
-  case 'eeco':if(it){it.eco=t.value===''?'':Number(t.value);save();render();}break;
+  case 'eq':if(it){ensureQ(it)[Number(t.getAttribute('data-k'))]=(t.value===''?'':Number(t.value));save();render();}break;
   case 'efreq':if(it){it.freqUnit=t.value;save();render();}break;
   case 'efdays':if(it){it.freqDays=Number(t.value)||1;save();}break;
   case 'bulktype':state.bulkDraft.type=t.value;break;
   case 'bulkstore':state.bulkDraft.store=t.value;break;
-  case 'bulkeco':state.bulkDraft.eco=t.value;break;
+  case 'bulkq':ensureQ(state.bulkDraft)[Number(t.getAttribute('data-k'))]=(t.value===''?'':Number(t.value));render();break;
   case 'dstore':state.draft.store=t.value;save();break;
-  case 'deco':state.draft.eco=t.value===''?'':Number(t.value);save();break;
+  case 'dq':ensureQ(state.draft)[Number(t.getAttribute('data-k'))]=(t.value===''?'':Number(t.value));save();render();break;
   case 'dfreq':state.draft.freqUnit=t.value;save();render();break;
   case 'dfdays':state.draft.freqDays=Number(t.value)||1;save();break;
   case 'ftype':state.filter.type=t.value;render();break;
   case 'ffreq':state.filter.freq=t.value;render();break;
   case 'ftag':state.filter.tag=t.value;render();break;
-  case 'seco':{var i=Number(t.getAttribute('data-i'));if(state.stores[i]){state.stores[i].eco=t.value===''?'':Number(t.value);save();render();}break;}
+  case 'sq':{var si2=Number(t.getAttribute('data-i'));if(state.stores[si2]){ensureQ(state.stores[si2])[Number(t.getAttribute('data-k'))]=(t.value===''?'':Number(t.value));save();render();}break;}
+  case 'naq':if(state.newsAddDraft){ensureQ(state.newsAddDraft)[Number(t.getAttribute('data-k'))]=(t.value===''?'':Number(t.value));render();}break;
+  case 'nastore':if(state.newsAddDraft){state.newsAddDraft.store=t.value;}break;
+  case 'nacat':if(state.newsAddDraft){state.newsAddDraft.category=t.value;}break;
+  case 'nacost':if(state.newsAddDraft){state.newsAddDraft.cost=Number(t.value);}break;
+  case 'nastatus':if(state.newsAddDraft){state.newsAddDraft.status=t.value;}break;
+  case 'nafreq':if(state.newsAddDraft){state.newsAddDraft.freqUnit=t.value;render();}break;
+  case 'nafdays':if(state.newsAddDraft){state.newsAddDraft.freqDays=Number(t.value)||1;}break;
   case 'sname':{var k=Number(t.getAttribute('data-i'));if(state.stores[k]){var old=t.getAttribute('data-orig');var nv=t.value.trim()||old;state.stores[k].name=nv;state.items.forEach(function(i){if(i.store===old)i.store=nv;});if(state.filter.store===old)state.filter.store=nv;save();render();}break;}
   case 'ncost':{var nc2=needById(id);if(nc2){nc2.cost=Number(t.value);save();render();}break;}
   case 'ncat':{var nc3=needById(id);if(nc3){nc3.category=t.value;save();render();}break;}
   case 'nq':{var nq=needById(id);if(nq){nq.q[Number(t.getAttribute('data-k'))]=Number(t.value);save();render();}break;}
+  case 'newsq':{var wq=newsById(id);if(wq){ensureQ(wq)[Number(t.getAttribute('data-k'))]=(t.value===''?'':Number(t.value));save();render();}break;}
   case 'newscat':{var wc=newsById(id);if(wc){wc.category=t.value;save();render();}break;}
   case 'newsavail':{var wa=newsById(id);if(wa){wa.availability=t.value;save();render();}break;}
  }
@@ -802,14 +992,14 @@ app.addEventListener('keydown',function(e){
   var w=wrapEl(e.target);if(!w)return;
   sWrap=w;sEl=w.querySelector('.item.swipe');if(!sEl)return;
   sId=w.getAttribute('data-swipe-id');x0=e.touches[0].clientX;y0=e.touches[0].clientY;active=true;locked=false;dx=0;
-  sEl.classList.add('swiping');sEl.classList.remove('swipereset');
+  sWrap.classList.add('sw-active');sEl.classList.add('swiping');sEl.classList.remove('swipereset');
  },{passive:true});
  app.addEventListener('touchmove',function(e){
   if(!active||!sEl)return;
   var ddx=e.touches[0].clientX-x0,ddy=e.touches[0].clientY-y0;
   if(!locked){
    if(Math.abs(ddx)>Math.abs(ddy)&&Math.abs(ddx)>8){locked=true;}
-   else if(Math.abs(ddy)>8){active=false;sEl.classList.remove('swiping');sEl.style.transform='';return;}
+   else if(Math.abs(ddy)>8){active=false;sEl.classList.remove('swiping');if(sWrap)sWrap.classList.remove('sw-active');sEl.style.transform='';return;}
    else{return;}
   }
   if(ddx>0)ddx=0; if(ddx<-160)ddx=-160; dx=ddx;
@@ -817,10 +1007,10 @@ app.addEventListener('keydown',function(e){
   if(e.cancelable)e.preventDefault();
  },{passive:false});
  function endSwipe(){
-  if(!active||!sEl){active=false;sEl=null;sWrap=null;return;}
-  var el=sEl,id=sId,d=dx; el.classList.remove('swiping'); active=false;sEl=null;sWrap=null;sId=null;
+  if(!active||!sEl){if(sWrap)sWrap.classList.remove('sw-active');active=false;sEl=null;sWrap=null;return;}
+  var el=sEl,wrap=sWrap,id=sId,d=dx; el.classList.remove('swiping'); active=false;sEl=null;sWrap=null;sId=null;
   if(d<-80){state.items=state.items.filter(function(i){return i.id!==id;});save();render();}
-  else{el.classList.add('swipereset');el.style.transform='';}
+  else{if(wrap)wrap.classList.remove('sw-active');el.classList.add('swipereset');el.style.transform='';}
  }
  app.addEventListener('touchend',endSwipe,{passive:true});
  app.addEventListener('touchcancel',endSwipe,{passive:true});
@@ -946,20 +1136,20 @@ function needsCategory(cat){
 }
 function needCard(it){if(it.id===state.nEditingId)return needEdit(it);if(it.id===state.nExpandedId)return needExpanded(it);return needCollapsed(it);}
 function needCollapsed(it){
- var sm=statusMeta(it.status),avg=avgQ(it.q);
+ var sm=statusMeta(it.status);
  return '<div class="ncard" data-act="nexpand" data-id="'+it.id+'" style="cursor:pointer;"><div class="ntop"><div><div class="nname">'+esc(it.name||'Untitled')+'</div><div class="ndesc">'+esc(it.desc)+'</div></div>'+
-  '<span class="eco '+ecoClsN(avg)+'">'+avg.toFixed(1)+'</span></div>'+
+  scoreBadge(it.q)+'</div>'+
   '<div class="nmeta"><span class="m">'+costStr(it.cost)+'</span><span class="m">'+esc(roiStr(it.roi))+'</span>'+
   '<span class="spill" style="background:'+sm.bg+';color:'+sm.tx+';">'+sm.label+'</span>'+
   '<span style="margin-left:auto;color:var(--ink3);display:inline-flex;">'+ico('chevronDown')+'</span></div></div>';
 }
 function needExpanded(it){
- var sm=statusMeta(it.status),avg=avgQ(it.q);
- var bars=QUAL.map(function(q,i){var v=it.q[i];return '<div><div class="qlab"><span>'+q[1]+'</span><span>'+v+'</span></div><div class="qbar"><div class="qfill" style="width:'+(v*10)+'%;background:'+qColor(v)+';"></div></div></div>';}).join('');
+ var sm=statusMeta(it.status);
+ var bars=ECO.map(function(q,i){var v=Number(it.q[i]||0);return '<div><div class="qlab"><span>'+q[1]+'</span><span>'+v+'</span></div><div class="qbar"><div class="qfill" style="width:'+(v*10)+'%;background:'+qColor(v)+';"></div></div></div>';}).join('');
  var seg='<div class="status-seg">'+['idea','planned','done'].map(function(k){var m=statusMeta(k),on=it.status===k;return '<button data-act="nstatus" data-id="'+it.id+'" data-v="'+k+'" class="'+(on?'on':'')+'" style="'+(on?'color:'+m.tx+';':'')+'">'+m.label+'</button>';}).join('')+'</div>';
  var srcs=(it.sources&&it.sources.length)?('<div class="srcs"><div class="sh">Sources</div>'+it.sources.map(function(s){return '<a class="srcln" href="'+escA(s[1])+'" target="_blank" rel="noopener">'+ico('ext')+esc(s[0])+'</a>';}).join('')+'</div>'):'';
  return '<div class="ncard exp"><div class="ntop" data-act="nexpand" data-id="'+it.id+'" style="cursor:pointer;"><div><div class="nname">'+esc(it.name||'Untitled')+'</div><div class="ndesc">'+esc(it.desc)+'</div></div>'+
-  '<span class="eco '+ecoClsN(avg)+'">'+avg.toFixed(1)+'</span></div>'+
+  scoreBadge(it.q)+'</div>'+
   '<div class="nmeta"><span class="m">'+costStr(it.cost)+' cost</span><span class="m">'+esc(roiStr(it.roi))+'</span></div>'+seg+
   '<div class="qgrid">'+bars+'</div>'+srcs+
   '<div class="erow2" style="margin-top:12px;"><button class="del" data-act="ndel" data-id="'+it.id+'">'+ico('trash')+' Remove</button>'+
@@ -968,14 +1158,14 @@ function needExpanded(it){
 function needEdit(it){
  var catOpts=CATS.map(function(c){return '<option value="'+c.key+'"'+(it.category===c.key?' selected':'')+'>'+c.label+'</option>';}).join('');
  var costOpts=[[1,'$ (low)'],[2,'$$ (medium)'],[3,'$$$ (high)']].map(function(o){return '<option value="'+o[0]+'"'+(it.cost===o[0]?' selected':'')+'>'+o[1]+'</option>';}).join('');
- var qfields=QUAL.map(function(q,i){return '<div class="f"><label>'+q[1]+'</label><select data-act="nq" data-id="'+it.id+'" data-k="'+i+'">'+scoreOptions(it.q[i])+'</select></div>';}).join('');
+ var qfields=ECO.map(function(q,i){return '<div class="f"><label>'+q[1]+'</label><select data-act="nq" data-id="'+it.id+'" data-k="'+i+'">'+scoreOptions(it.q[i])+'</select></div>';}).join('');
  var srcRows=(it.sources||[]).map(function(s,si){return '<div style="display:flex;gap:6px;margin-bottom:6px;"><input data-act="nsrct" data-id="'+it.id+'" data-si="'+si+'" value="'+escA(s[0])+'" placeholder="Source title" style="flex:1;min-width:0;font-size:13px;background:var(--muted);border:.5px solid var(--border);border-radius:8px;padding:7px 10px;"/><input data-act="nsrcu" data-id="'+it.id+'" data-si="'+si+'" value="'+escA(s[1])+'" placeholder="https://" style="flex:1;min-width:0;font-size:13px;background:var(--muted);border:.5px solid var(--border);border-radius:8px;padding:7px 10px;"/><button data-act="nsrcdel" data-id="'+it.id+'" data-si="'+si+'" style="background:none;border:none;color:var(--ink3);cursor:pointer;">'+ico('x')+'</button></div>';}).join('');
  return '<div class="ncard exp"><div class="erow"><input class="enm" data-act="nname" data-id="'+it.id+'" value="'+escA(it.name)+'" placeholder="Idea name"/><button class="lnk" data-act="ndone" data-id="'+it.id+'">'+ico('chevronUp')+'</button></div>'+
   '<div class="f" style="margin-bottom:10px;"><label>Description</label><textarea data-act="ndesc" data-id="'+it.id+'" placeholder="What it is and why it helps...">'+esc(it.desc)+'</textarea></div>'+
   '<div class="grid2"><div class="f"><label>Category</label><select data-act="ncat" data-id="'+it.id+'">'+catOpts+'</select></div>'+
   '<div class="f"><label>Cost tier</label><select data-act="ncost" data-id="'+it.id+'">'+costOpts+'</select></div>'+
   '<div class="f"><label>ROI (years)</label><input type="number" min="0" data-act="nroi" data-id="'+it.id+'" value="'+(it.roi==null?'':it.roi)+'" placeholder="e.g. 7"/></div></div>'+
-  '<div class="slabel" style="margin:6px 2px 8px;">Quality ratings (0-10)</div><div class="grid2">'+qfields+'</div>'+
+  '<div class="slabel" style="margin:6px 2px 8px;">Eco Score <span class="muted">(0–10 each · sum ×2.5 = /100)</span></div><div class="grid2">'+qfields+'</div>'+
   '<div class="slabel" style="margin:12px 2px 8px;">Sources</div>'+srcRows+
   '<button class="clearbtn" data-act="nsrcadd" data-id="'+it.id+'" style="margin:0 0 10px;">'+ico('plus')+' Add source</button>'+
   '<div class="erow2"><button class="del" data-act="ndel" data-id="'+it.id+'">'+ico('trash')+' Delete</button><button class="done" data-act="ndone" data-id="'+it.id+'">Done</button></div></div>';
@@ -984,12 +1174,35 @@ function defRow(t,range,desc){return '<div class="defrow"><span class="deftier">
 function renderDefinitions(){
  var low=Math.round(MED_INCOME/40),high=Math.round(MED_INCOME/8);
  function money(n){return '$'+n.toLocaleString('en-US');}
+ var cfg=state.config;
  var head='<div class="pagehd"><div class="brand"><span class="logo">'+ico('book')+'</span><div><small>The Sustainable Home</small><b>Definitions</b></div></div></div>';
- var intro='<div class="slabel" style="margin:0 2px 6px;">Cost tiers</div><p style="margin:0 2px 6px;font-size:13px;color:var(--ink2);line-height:1.55;">Relative to the U.S. Census median household income ('+money(MED_INCOME)+' for '+MED_YEAR+'). They refresh once a year when new Census data is released (each September).</p>';
+
+ // ----- Eco Score (editable rubric) -----
+ var eco='<div class="slabel" style="margin:0 2px 6px;">Eco Score</div>'+
+  '<p style="margin:0 2px 8px;font-size:13px;color:var(--ink2);line-height:1.55;">Every product, material, practice, or system is scored <b>0–100</b>. The score is the sum of four sub-scores, each rated 0–10 and weighted ×2.5, for a top score of 100.</p>'+
+  '<div class="deflist">'+
+   '<div class="defrow"><span class="deftier" style="width:auto;font-size:13px;">×2.5</span><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:500;color:var(--ink);">Overall</div><textarea class="defta" data-act="defrub" data-k="overall">'+esc(cfg.rubric.overall)+'</textarea></div></div>'+
+   ECO.map(function(c){return '<div class="defrow"><span class="deftier" style="width:auto;font-size:13px;">2.5</span><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:500;color:var(--ink);">'+c[1]+'</div><textarea class="defta" data-act="defrub" data-k="'+c[0]+'">'+esc(cfg.rubric[c[0]])+'</textarea></div></div>';}).join('')+
+  '</div>';
+
+ // ----- News categories + Eco Score threshold (editable, drives the crawler) -----
+ var thr='<div class="slabel" style="margin:20px 2px 6px;">Sustainability News filter</div>'+
+  '<p style="margin:0 2px 8px;font-size:13px;color:var(--ink2);line-height:1.55;">The News crawler keeps an article only if it fits one of the categories below (by keyword) <b>and</b> its estimated Eco Score is at least this threshold. Articles that fit no category are dropped. Edits here are saved and used on the next crawl.</p>'+
+  '<div class="f" style="max-width:240px;margin:0 2px 14px;"><label>Minimum Eco Score for News (0–100)</label><input type="number" min="0" max="100" data-act="defthreshold" value="'+Number(cfg.threshold)+'"/></div>';
+ var cats='<div class="deflist">'+cfg.cats.map(function(c){
+  return '<div class="defrow" style="flex-direction:column;align-items:stretch;gap:8px;">'+
+   '<div class="f"><label>Category name</label><input data-act="defcatlabel" data-key="'+c.key+'" value="'+escA(c.label)+'"/></div>'+
+   '<div class="f"><label>Definition</label><textarea class="defta" data-act="defcatdef" data-key="'+c.key+'">'+esc(c.def)+'</textarea></div>'+
+   '<div class="f"><label>Crawler keywords (comma-separated)</label><textarea class="defta" data-act="defcatkw" data-key="'+c.key+'">'+esc(c.kw)+'</textarea></div>'+
+  '</div>';
+ }).join('')+'</div>'+
+ '<button class="clearbtn" data-act="defreset" style="margin:12px 2px 0;">Reset Eco Score & categories to defaults</button>';
+
+ var intro='<div class="slabel" style="margin:22px 2px 6px;">Cost tiers</div><p style="margin:0 2px 6px;font-size:13px;color:var(--ink2);line-height:1.55;">Relative to the U.S. Census median household income ('+money(MED_INCOME)+' for '+MED_YEAR+'). They refresh once a year when new Census data is released (each September).</p>';
  var rows='<div class="deflist">'+defRow('$','Under '+money(low),'Less than 1/40 of median household income.')+defRow('$$',money(low)+' - '+money(high),'Between 1/40 and 1/8 of median household income.')+defRow('$$$','Over '+money(high),'More than 1/8 of median household income.')+'</div>';
  var roi='<div class="slabel" style="margin:18px 2px 6px;">ROI (years)</div><p style="margin:0 2px;font-size:13px;color:var(--ink2);line-height:1.55;">The typical number of years for energy, water, or durability savings to offset the added cost. It is an approximate planning estimate; actual payback varies by home, climate, utility rates, and incentives. Items without a direct monetary payback show "varies".</p>';
  var src='<p class="hint" style="margin:16px 2px 0;font-size:12px;">Source: U.S. Census Bureau, Income in the United States: '+MED_YEAR+'.</p>';
- return head+intro+rows+roi+src;
+ return head+eco+thr+cats+intro+rows+roi+src;
 }
 
 var NEWS_SEED=[
@@ -1061,6 +1274,7 @@ function newsCollapsed(a){
   '<div class="ntitle" style="margin-top:3px;">'+esc(a.title||'Untitled')+'</div>'+
   '<div class="nbody clamp">'+esc(a.body)+'</div>'+
   '<div style="display:flex;align-items:center;gap:6px;margin-top:10px;flex-wrap:wrap;"><span class="catpill"><span style="display:inline-flex;">'+ico(cm.icon)+'</span>'+cm.label+'</span>'+
+   scoreBadge(a.q)+
    '<span class="spill" style="background:'+av.bg+';color:'+av.tx+';">'+av.label+'</span>'+
    '<span style="margin-left:auto;">'+addBtnHTML(a)+'</span></div></div>';
 }
@@ -1075,7 +1289,7 @@ function newsExpanded(a){
   '<div class="ntitle" style="font-size:16px;margin-top:4px;">'+esc(a.title||'Untitled')+'</div>'+
   '<div class="nbody" style="margin-top:8px;">'+esc(a.body)+'</div>'+
   (a.url?'<a class="srclink" data-act="noop" href="'+escA(a.url)+'" target="_blank" rel="noopener">'+ico('ext')+'Read at '+esc(a.source||'source')+'</a>':'')+
-  '<div style="display:flex;align-items:center;gap:6px;margin-top:12px;flex-wrap:wrap;"><span class="catpill"><span style="display:inline-flex;">'+ico(cm.icon)+'</span>'+cm.label+'</span><span class="spill" style="background:'+av.bg+';color:'+av.tx+';">'+av.label+'</span><span style="margin-left:auto;">'+addBtnHTML(a)+'</span></div>'+
+  '<div style="display:flex;align-items:center;gap:6px;margin-top:12px;flex-wrap:wrap;"><span class="catpill"><span style="display:inline-flex;">'+ico(cm.icon)+'</span>'+cm.label+'</span>'+scoreBadge(a.q)+'<span class="spill" style="background:'+av.bg+';color:'+av.tx+';">'+av.label+'</span><span style="margin-left:auto;">'+addBtnHTML(a)+'</span></div>'+
   utils+
   '<div class="erow2" style="margin-top:12px;"><button class="del" data-act="newsdel" data-id="'+a.id+'">'+ico('trash')+' Remove</button><button class="addlink" data-act="newsedit" data-id="'+a.id+'">'+ico('edit')+' Edit tags</button></div></div>';
 }
@@ -1088,6 +1302,7 @@ function newsEdit(a){
   '<div class="f"><label>Availability</label><select data-act="newsavail" data-id="'+a.id+'">'+avOpts+'</select></div>'+
   '<div class="f"><label>URL</label><input data-act="newsurl" data-id="'+a.id+'" value="'+escA(a.url)+'" placeholder="https://"/></div></div>'+
   '<div class="f" style="margin-bottom:10px;"><label>Summary</label><textarea data-act="newsbody" data-id="'+a.id+'" placeholder="Short summary...">'+esc(a.body)+'</textarea></div>'+
+  qGrid(a.q,'newsq',' data-id="'+a.id+'"')+
   '<div class="erow2"><button class="del" data-act="newsdel" data-id="'+a.id+'">'+ico('trash')+' Delete</button><button class="done" data-act="newsdone" data-id="'+a.id+'">Done</button></div></div>';
 }
 function newsCard(a){if(a.id===state.newsEditingId)return newsEdit(a);if(a.id===state.newsExpandedId)return newsExpanded(a);return newsCollapsed(a);}
@@ -1095,20 +1310,28 @@ function renderNews(){
  var head='<div class="hd"><div class="brand"><span class="logo">'+ico('plant')+'</span><div><small>The Sustainable Home</small><b>News</b></div></div></div>';
  var barrow='<div style="display:flex;align-items:center;margin:0 2px 12px;gap:8px;"><button class="addlink" data-act="newsfilthl" style="'+(state.newsFilterHL?'color:#b58a12;font-weight:500;':'')+'">'+ico('star')+(state.newsFilterHL?'Highlighted':'Highlights')+'</button><button class="addlink" data-act="newssortopen" style="margin-left:auto;">'+ico('sort')+' '+sortLabel()+'</button><button class="addlink" data-act="newssources">'+ico('plus')+'Sources</button></div>';
  if(state.newsSort==='unread'){if(!state.newsOrder)freezeNewsOrder();}else{state.newsOrder=null;}
- var arr=state.news.filter(function(a){return (state.newsFilterCat==='all'||a.category===state.newsFilterCat)&&(state.newsFilterAvail==='all'||a.availability===state.newsFilterAvail)&&(!state.newsFilterHL||a.highlight);});
+ newsLifecycle(false);
+ function catAvail(a){return (state.newsFilterCat==='all'||a.category===state.newsFilterCat)&&(state.newsFilterAvail==='all'||a.availability===state.newsFilterAvail);}
+ var arr=state.news.filter(function(a){return !a.archived&&catAvail(a)&&(!state.newsFilterHL||a.highlight);});
  arr=newsSorted(arr);
  var feed=arr.length?arr.map(newsCard).join(''):'<p class="hint" style="padding:6px 2px">No articles match. Try clearing filters.</p>';
- return head+barrow+newsFilters()+feed;
+ var archived=state.newsFilterHL?[]:newsSorted(state.news.filter(function(a){return a.archived&&catAvail(a);}));
+ var archSection='';
+ if(archived.length){
+  archSection='<div class="arch" style="margin-top:14px;"><button class="archhd" data-act="newsarchtoggle">'+ico(state.newsArchiveOpen?'chevronDown':'chevronRight')+ico('archive')+'<span>Archive · 30 Days Old</span><span class="ct">'+archived.length+' article'+(archived.length>1?'s':'')+'</span></button>'+
+   (state.newsArchiveOpen?'<div class="archlist" style="margin-top:8px;">'+archived.map(newsCard).join('')+'</div>':'')+'</div>';
+ }
+ return head+barrow+newsFilters()+feed+archSection;
 }
 
-function mapItemRow(it){return {id:it.id,user_id:cloud.user.id,name:it.name,type:it.type,freq_unit:it.freqUnit||'weekly',freq_days:it.freqDays||7,tag:it.tag||'',store:it.store||'',eco:(it.eco===''||it.eco==null)?null:Number(it.eco),checked:!!it.checked,checked_at:it.checkedAt?new Date(it.checkedAt).toISOString():null,created_at:it.createdAt?new Date(it.createdAt).toISOString():new Date().toISOString()};}
-function rowItem(r){return {id:r.id,name:r.name,type:r.type,freqUnit:r.freq_unit,freqDays:r.freq_days,tag:r.tag,store:r.store,eco:(r.eco==null?'':r.eco),checked:r.checked,checkedAt:r.checked_at?Date.parse(r.checked_at):null,createdAt:r.created_at?Date.parse(r.created_at):Date.now()};}
-function mapStoreRow(s){return {id:s.id,user_id:cloud.user.id,name:s.name||'',eco:(s.eco===''||s.eco==null)?null:Number(s.eco),category:s.category||'',note:s.note||''};}
-function rowStore(r){return {id:r.id,name:r.name,eco:(r.eco==null?'':r.eco),category:r.category||'',note:r.note||''};}
-function mapNeedRow(n){return {id:n.id,user_id:cloud.user.id,category:n.category,name:n.name||'',description:n.desc||'',cost:n.cost||2,roi:(n.roi==null||n.roi==='')?null:Number(n.roi),status:n.status||'idea',q:n.q||[5,5,5,5,5,5],sources:n.sources||[]};}
-function rowNeed(r){return {id:r.id,category:r.category,name:r.name,desc:r.description,cost:r.cost,roi:r.roi,status:r.status,q:r.q||[5,5,5,5,5,5],sources:r.sources||[]};}
-function mapNewsRow(a){return {id:a.id,user_id:cloud.user.id,title:a.title||'',source:a.source||'',url:a.url||'',body:a.body||'',category:a.category||'house',availability:a.availability||'available',published_at:a.publishedAt?new Date(a.publishedAt).toISOString():new Date().toISOString(),viewed:!!a.viewed,added:!!a.added,highlighted:!!a.highlight};}
-function rowNews(r){return {id:r.id,title:r.title,source:r.source,url:r.url,body:r.body,category:r.category,availability:r.availability,publishedAt:r.published_at?Date.parse(r.published_at):Date.now(),viewed:r.viewed,added:r.added,highlight:!!r.highlighted};}
+function mapItemRow(it){return {id:it.id,user_id:cloud.user.id,name:it.name,type:it.type,freq_unit:it.freqUnit||'weekly',freq_days:it.freqDays||7,tag:it.tag||'',store:it.store||'',eco:null,eco_q:(isRated(it.q)?it.q:null),checked:!!it.checked,checked_at:it.checkedAt?new Date(it.checkedAt).toISOString():null,created_at:it.createdAt?new Date(it.createdAt).toISOString():new Date().toISOString()};}
+function rowItem(r){return {id:r.id,name:r.name,type:r.type,freqUnit:r.freq_unit,freqDays:r.freq_days,tag:r.tag,store:r.store,q:(r.eco_q?fixQ4(r.eco_q):qFromEco(r.eco)),checked:r.checked,checkedAt:r.checked_at?Date.parse(r.checked_at):null,createdAt:r.created_at?Date.parse(r.created_at):Date.now()};}
+function mapStoreRow(s){return {id:s.id,user_id:cloud.user.id,name:s.name||'',eco:null,eco_q:(isRated(s.q)?s.q:null),category:s.category||'',note:s.note||''};}
+function rowStore(r){return {id:r.id,name:r.name,q:(r.eco_q?fixQ4(r.eco_q):qFromEco(r.eco)),category:r.category||'',note:r.note||''};}
+function mapNeedRow(n){return {id:n.id,user_id:cloud.user.id,category:n.category,name:n.name||'',description:n.desc||'',cost:n.cost||2,roi:(n.roi==null||n.roi==='')?null:Number(n.roi),status:n.status||'idea',q:(fixQ4(n.q)||[5,5,5,5]),sources:n.sources||[]};}
+function rowNeed(r){return {id:r.id,category:r.category,name:r.name,desc:r.description,cost:r.cost,roi:r.roi,status:r.status,q:(fixQ4(r.q)||[5,5,5,5]),sources:r.sources||[]};}
+function mapNewsRow(a){return {id:a.id,user_id:cloud.user.id,title:a.title||'',source:a.source||'',url:a.url||'',body:a.body||'',category:a.category||'house',availability:a.availability||'available',eco_q:(isRated(a.q)?a.q:null),published_at:a.publishedAt?new Date(a.publishedAt).toISOString():new Date().toISOString(),viewed:!!a.viewed,added:!!a.added,highlighted:!!a.highlight};}
+function rowNews(r){return {id:r.id,title:r.title,source:r.source,url:r.url,body:r.body,category:r.category,availability:r.availability,q:(r.eco_q?fixQ4(r.eco_q):null),seenAt:(r.created_at?Date.parse(r.created_at):Date.now()),archived:false,publishedAt:r.published_at?Date.parse(r.published_at):Date.now(),viewed:r.viewed,added:r.added,highlight:!!r.highlighted};}
 function mapSourceRow(s){return {id:s.id,user_id:cloud.user.id,url:s.url||'',created_at:s.createdAt?new Date(s.createdAt).toISOString():new Date().toISOString()};}
 function rowSource(r){return {id:r.id,url:r.url,createdAt:r.created_at?Date.parse(r.created_at):Date.now()};}
 async function refreshNewsFromCloud(){
@@ -1118,8 +1341,8 @@ async function refreshNewsFromCloud(){
   if(res.error||!res.data)return;
   var have={};state.news.forEach(function(a){have[a.id]=true;});
   var added=0;
-  res.data.forEach(function(r){if(!have[r.id]){state.news.push(rowNews(r));added++;}});
-  if(added){save();render();}
+  res.data.forEach(function(r){if(!have[r.id]){var a=rowNews(r);if(!isRated(a.q))a.q=estimateArticleQ(a);state.news.push(a);added++;}});
+  if(added){newsLifecycle(false);save();render();}
  }catch(e){}
 }
 function renderLogin(){
@@ -1170,12 +1393,13 @@ async function initAuth(){
  try{
   var g=await sb.auth.getSession();
   if(g.data&&g.data.session){cloud.user=g.data.session.user;await pullAll();}
+  cloud.booting=false;
   render();
   sb.auth.onAuthStateChange(function(ev,session){
    if(session&&session.user){ if(!cloud.user){cloud.user=session.user;cloud.authMsg='';pullAll().then(render);} }
    else { cloud.user=null; render(); }
   });
- }catch(e){ cloud.enabled=false; render(); }
+ }catch(e){ cloud.enabled=false; cloud.booting=false; render(); }
 }
 async function pullAll(){
  try{
@@ -1186,18 +1410,21 @@ async function pullAll(){
    sb.from('needs_ideas').select('*').eq('user_id',uid),
    sb.from('news_articles').select('*').eq('user_id',uid),
    sb.from('profiles').select('*').eq('id',uid).maybeSingle(),
-   sb.from('news_sources').select('*').eq('user_id',uid)
+   sb.from('news_sources').select('*').eq('user_id',uid),
+   sb.from('app_config').select('*').eq('user_id',uid).maybeSingle()
   ]);
-  var items=r[0].data||[],stores=r[1].data||[],needs=r[2].data||[],news=r[3].data||[],prof=r[4].data,sources=r[5].data||[];
+  var items=r[0].data||[],stores=r[1].data||[],needs=r[2].data||[],news=r[3].data||[],prof=r[4].data,sources=r[5].data||[],cfg=r[6]&&r[6].data;
   if(items.length===0&&stores.length===0&&needs.length===0&&news.length===0){
    await pushAll();
   } else {
    state.items=items.map(rowItem);
    state.stores=stores.map(rowStore);
    state.needs=needs.map(rowNeed);
-   state.news=news.map(rowNews);
+   state.news=migrateNewsArr(news.map(rowNews));
    state.newsSources=sources.map(rowSource);
    if(prof){ if(prof.consumables_sort)state.sort=prof.consumables_sort; if(prof.news_sort)state.newsSort=prof.news_sort; }
+   if(cfg&&cfg.config)state.config=mergeConfig(cfg.config);
+   newsLifecycle(true);
    save();
   }
  }catch(e){}
@@ -1222,7 +1449,8 @@ async function pushAll(){
    syncTable('needs_ideas',state.needs.map(mapNeedRow),uid),
    upsertRows('news_articles',state.news.map(mapNewsRow)),
    syncTable('news_sources',state.newsSources.map(mapSourceRow),uid),
-   sb.from('profiles').upsert({id:uid,consumables_sort:state.sort,news_sort:state.newsSort})
+   sb.from('profiles').upsert({id:uid,consumables_sort:state.sort,news_sort:state.newsSort}),
+   sb.from('app_config').upsert({user_id:uid,config:state.config,updated_at:new Date().toISOString()})
   ]);
  }catch(e){}
 }
