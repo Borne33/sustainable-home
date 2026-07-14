@@ -419,6 +419,8 @@ function newsLifecycle(doPurge){
  return changed;
 }
 function storeNames(){return state.stores.map(function(s){return s.name;}).filter(Boolean);}
+function storeQ(name){if(!name)return null;for(var i=0;i<state.stores.length;i++){if(state.stores[i].name===name&&isRated(state.stores[i].q))return state.stores[i].q.slice();}return null;}
+function dueStr(it){var d=new Date(nextDue(it));return d.toLocaleDateString('en-US',{month:'short',day:'numeric'});}
 
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
 function escA(s){return esc(s).replace(/'/g,'&#39;');}
@@ -474,9 +476,10 @@ function comparator(isChecked){
 function groups(){
  var vis=state.items.filter(matches);
  var unchecked=vis.filter(function(i){return !i.checked;}).sort(comparator(false));
- var purchased=vis.filter(function(i){return i.checked&&i.type!=='onetime';}).sort(comparator(true));
+ var purchased=vis.filter(function(i){return i.checked&&i.type==='regular';}).sort(comparator(true));
+ var purchasedRec=vis.filter(function(i){return i.checked&&i.type==='recurring';}).sort(comparator(true));
  var archive=vis.filter(function(i){return i.checked&&i.type==='onetime';}).sort(comparator(true));
- return {unchecked:unchecked,purchased:purchased,archive:archive};
+ return {unchecked:unchecked,purchased:purchased,purchasedRec:purchasedRec,archive:archive};
 }
 
 function ecoOptions(sel){var o='<option value="">Not rated</option>';for(var i=0;i<=10;i++){o+='<option value="'+i+'"'+(String(sel)===String(i)?' selected':'')+'>'+i+'</option>';}return o;}
@@ -521,7 +524,7 @@ function draftForm(){
  '</div>';
 }
 
-function visibleIds(g){return g.unchecked.concat(g.purchased,g.archive).map(function(i){return i.id;});}
+function visibleIds(g){return g.unchecked.concat(g.purchased,g.purchasedRec,g.archive).map(function(i){return i.id;});}
 function bulkSelCount(){return Object.keys(state.bulkSel).filter(function(k){return state.bulkSel[k];}).length;}
 function bulkBar(g){
  var ids=visibleIds(g);
@@ -540,7 +543,7 @@ function rowDisplay(it){
  var meta=[];
  if(it.store)meta.push(esc(it.store));
  if(it.tag)meta.push(esc(trunc(it.tag)));
- if(it.type==='recurring')meta.push(freqAbbr(it));
+ if(it.type==='recurring'){meta.push(freqAbbr(it));if(it.checked&&it.checkedAt)meta.push('Buy again '+dueStr(it));}
  var badge=scoreBadge(it.q);
  if(state.bulkMode){
   var sel=!!state.bulkSel[it.id];
@@ -768,6 +771,10 @@ function render(){
    html+='<div class="slabel">Purchased · '+g.purchased.length+'</div>';
    html+='<div class="list">'+g.purchased.map(row).join('')+'</div>';
   }
+  if(g.purchasedRec.length){
+   html+='<div class="slabel">Purchased Recurring · '+g.purchasedRec.length+'</div>';
+   html+='<div class="list">'+g.purchasedRec.map(row).join('')+'</div>';
+  }
   if(g.archive.length){
    html+='<div class="arch"><button class="archhd" data-act="togglearchive">'+ico(state.archiveOpen?'chevronDown':'chevronRight')+ico('archive')+'<span>Archive</span><span class="ct">'+g.archive.length+' one-time item'+(g.archive.length>1?'s':'')+'</span></button>'+
     (state.archiveOpen?'<div class="list archlist">'+g.archive.map(row).join('')+'</div>':'')+'</div>';
@@ -783,7 +790,8 @@ function addItem(){
  var name=(state.newName||'').trim();
  if(!name)return;
  var d=state.draft;
- state.items.push({id:uid(),name:name,type:d.type,freqUnit:d.freqUnit,freqDays:d.freqDays,tag:d.tag,store:d.store,q:(isRated(d.q)?d.q.slice():null),checked:false,checkedAt:null,createdAt:Date.now()});
+ var q=isRated(d.q)?d.q.slice():storeQ(d.store); // default to the store's Eco Score
+ state.items.push({id:uid(),name:name,type:d.type,freqUnit:d.freqUnit,freqDays:d.freqDays,tag:d.tag,store:d.store,q:q,checked:false,checkedAt:null,createdAt:Date.now()});
  state.newName='';state.draft.tag='';state.draft.q=null;
  save();render();
  var el=document.getElementById('newname');if(el)el.focus();
@@ -878,7 +886,7 @@ app.addEventListener('click',function(e){
   case 'pillstore':state.filter.store=t.getAttribute('data-v');render();break;
   case 'clearfilter':state.filter.type='';state.filter.freq='';state.filter.tag='';render();break;
   case 'togglearchive':state.archiveOpen=!state.archiveOpen;render();break;
-  case 'uncheckall':state.items.forEach(function(i){if(i.checked&&i.type!=='onetime')i.checked=false;});save();render();break;
+  case 'uncheckall':state.items.forEach(function(i){if(i.checked&&i.type==='regular')i.checked=false;});save();render();break;
   case 'toggle':if(it){it.checked=!it.checked;if(it.checked)it.checkedAt=Date.now();save();render();}break;
   case 'bulkmode':state.bulkMode=!state.bulkMode;if(!state.bulkMode)state.bulkSel={};render();break;
   case 'bulktoggle':if(id){if(state.bulkSel[id])delete state.bulkSel[id];else state.bulkSel[id]=true;render();}break;
@@ -947,7 +955,7 @@ app.addEventListener('change',function(e){
   case 'bulktype':state.bulkDraft.type=t.value;break;
   case 'bulkstore':state.bulkDraft.store=t.value;break;
   case 'bulkq':ensureQ(state.bulkDraft)[Number(t.getAttribute('data-k'))]=(t.value===''?'':Number(t.value));render();break;
-  case 'dstore':state.draft.store=t.value;save();break;
+  case 'dstore':state.draft.store=t.value;if(!isRated(state.draft.q)){var dsq=storeQ(t.value);state.draft.q=dsq?dsq:null;}save();render();break;
   case 'dq':ensureQ(state.draft)[Number(t.getAttribute('data-k'))]=(t.value===''?'':Number(t.value));save();render();break;
   case 'dfreq':state.draft.freqUnit=t.value;save();render();break;
   case 'dfdays':state.draft.freqDays=Number(t.value)||1;save();break;
